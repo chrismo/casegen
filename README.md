@@ -87,7 +87,7 @@ produces this output:
 
 ## FAQ
 
-I don't get any output when I try your sample input file?
+_I don't get any output when I try your sample input file?_
 
 Make sure there's a newline at the end of your data. In the above example input file, make sure the last line is "-------\n" not "--------"
 
@@ -114,7 +114,6 @@ sample.rb:
 		--------------
 		
 
-
-Are there other tools similar to CaseGen?
+_Are there other tools similar to CaseGen?_
 
 <a href="http://code.google.com/p/tcases/">tcases</a> is one to check out.
