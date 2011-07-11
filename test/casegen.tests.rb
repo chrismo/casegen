@@ -92,25 +92,69 @@ class TestParser < Test::Unit::TestCase
   
   def test_parse_no_sets
     data = <<-CASEDATA.outdent
+    CASEDATA
+
+    parser = Parser.new(data)
+    assert_equal(0, parser.agents.length)
+  end
+
+  def test_parse_agent_with_missing_hyphen_line
+    data = <<-CASEDATA.outdent
       sample
       
       sample_data
     CASEDATA
   
     parser = Parser.new(data)
-    assert_equal(0, parser.agents.length)
+    assert_equal(1, parser.agents.length)
+    sample = parser.agents[0]
+    assert_equal(SampleAgent, sample.class)
+    assert_equal(nil, sample.data)
+    assert_equal([], sample.reference_agents)
   end
   
-  def test_parse_set_name_no_data
+  def test_parse_just_agent
+    data = <<-CASEDATA.outdent
+      sample
+    CASEDATA
+  
+    parser = Parser.new(data)
+    assert_equal(1, parser.agents.length)
+    sample = parser.agents[0]
+    assert_equal(SampleAgent, sample.class)
+    assert_equal(nil, sample.data)
+    assert_equal([], sample.referenced_agents)
+  end
+
+  def test_parse_just_agent_with_underline
     data = <<-CASEDATA.outdent
       sample
       -
     CASEDATA
-  
+
     parser = Parser.new(data)
-    assert_equal(0, parser.agents.length)
+    assert_equal(1, parser.agents.length)
+    sample = parser.agents[0]
+    assert_equal(SampleAgent, sample.class)
+    assert_equal(nil, sample.data)
+    assert_equal([], sample.referenced_agents)
   end
-  
+
+  def test_parse_just_agent_with_empty_data
+    data = <<-CASEDATA.outdent
+      sample
+      -
+
+    CASEDATA
+
+    parser = Parser.new(data)
+    assert_equal(1, parser.agents.length)
+    sample = parser.agents[0]
+    assert_equal(SampleAgent, sample.class)
+    assert_equal(nil, sample.data)
+    assert_equal([], sample.referenced_agents)
+  end
+
   def test_parse_invalid_agent
     data = <<-CASEDATA.outdent
       sermple
@@ -139,6 +183,10 @@ class TestParser < Test::Unit::TestCase
     rescue ParserException
       # expected
     end
+  end
+
+  def test_parse_should_not_be_so_strict
+    fail("change parser to allow empty agents")
   end
 end
  

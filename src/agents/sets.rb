@@ -2,6 +2,12 @@ require "#{File.dirname(__FILE__)}/../casegen"
 $LOAD_PATH << "#{File.expand_path(File.join(File.dirname(__FILE__), 'sets'))}"
 require 'enum/op'
 
+class String
+  def to_u
+    self.gsub(/ /, '_')
+  end
+end
+
 module CLabs::CaseGen
   class Set
     attr_reader :name, :data
@@ -285,6 +291,43 @@ module CLabs::CaseGen
         }
       end
       formatted_tuples
+    end
+  end
+
+  class RubyArrayOutput < Agent
+    def self.agent_id
+      "casegen:ruby_array"
+    end
+
+    def initialize(data, reference_agents, io=STDOUT)
+      @io = io
+      @struct_name = "Case"
+      @struct_name = data if !data.empty?
+      @agents = reference_agents
+      @agents.each do |agent| execute(agent) end
+    end
+
+    def execute(agent)
+      struct_header = "#{@struct_name} = Struct.new("
+      struct = ''
+      agent.titles.each do |title|
+        struct << ', ' if !struct.empty?
+        struct << ":#{title.to_u.downcase}"
+      end
+      struct << ')'
+
+      guts_header = 'cases = ['
+      guts = ''
+      agent.combinations.each do |combo|
+        guts << ",\n#{' ' * guts_header.length}" if !guts.empty?
+        guts << "#{@struct_name}.new#{combo.inspect.gsub(/\[/, '(').gsub(/\]/, ')')}"
+      end
+      @io.print(struct_header)
+      @io.print(struct)
+      @io.print("\n\n")
+      @io.print(guts_header)
+      @io.print(guts)
+      @io.print("]\n")
     end
   end
 end

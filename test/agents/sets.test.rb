@@ -166,6 +166,56 @@ class TestRulesParsing < Test::Unit::TestCase
       assert_equal(['a', 'b'], rules.titles)
     end
   end
+
+  class TestRubyCaseArray < Test::Unit::TestCase
+    def test_default_case_name
+      sets = Sets.new("a: 1, 2\nb:3, 4")
+      out = MockStdOut.new
+      RubyArrayOutput.new("", [sets], out)
+      expected = <<-TEXT.outdent
+        Case = Struct.new(:a, :b)
+
+        cases = [Case.new("1", "3"),
+                 Case.new("1", "4"),
+                 Case.new("2", "3"),
+                 Case.new("2", "4")]
+      TEXT
+      assert_equal(expected, out.to_s)
+    end
+
+    def test_specified_case_name
+      sets = Sets.new("a: 1, 2\nb:3, 4")
+      out = MockStdOut.new
+      RubyArrayOutput.new("DataSubmitCase", [sets], out)
+      expected = <<-TEXT.outdent
+        DataSubmitCase = Struct.new(:a, :b)
+
+        cases = [DataSubmitCase.new("1", "3"),
+                 DataSubmitCase.new("1", "4"),
+                 DataSubmitCase.new("2", "3"),
+                 DataSubmitCase.new("2", "4")]
+      TEXT
+      assert_equal(expected, out.to_s)
+    end
+  end
+
+  class MockStdOut
+    def initialize
+      @s = ''
+    end
+
+    def puts(s)
+      @s << s << "\n"
+    end
+
+    def print(s)
+      @s << s
+    end
+
+    def to_s
+      @s
+    end
+  end
 end
 
 
