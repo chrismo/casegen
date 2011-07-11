@@ -1,0 +1,171 @@
+$LOAD_PATH << "#{File.dirname(__FILE__)}/.."
+$LOAD_PATH << "#{File.dirname(__FILE__)}/../../src/agents"
+require 'test/unit'
+require 'sets'
+
+include CLabs::CaseGen
+
+class TestParsing < Test::Unit::TestCase
+  def test_sets_default
+    data = <<-CASEDATA.outdent
+      bar: 1, 2, 3,456.98
+       foo list:a, b, c
+    CASEDATA
+    cases = Sets.new(data)
+    assert_equal(2, cases.sets.length)
+    
+    assert_equal("bar", cases.sets[0].name)
+    assert_equal(["1", "2", "3,456.98"], cases.sets[0].data)
+    
+    assert_equal("foo list", cases.sets[1].name)
+    assert_equal(["a", "b", "c"], cases.sets[1].data)
+  end
+end
+
+class TestCombinations < Test::Unit::TestCase
+  def test_combos_2_by_2
+    sets = Sets.new("a: 1, 2\nb:3, 4")
+    assert_equal([['1', '3'], ['1', '4'], ['2', '3'], ['2', '4']], sets.combinations)
+    assert_equal(['a', 'b'], sets.titles)
+  end
+
+  def test_combos_2_by_3
+    sets = Sets.new("a: 1, 2\nb:3, 4, 5")
+    assert_equal([['1', '3'], ['1', '4'], ['1', '5'],
+                  ['2', '3'], ['2', '4'], ['2', '5']], sets.combinations)
+    assert_equal(['a', 'b'], sets.titles)
+  end
+end
+
+class TestRulesParsing < Test::Unit::TestCase
+  def test_rules_single
+    data = <<-RULES.outdent
+      exclude foo = bar
+    RULES
+    rules = Rules.new(data)
+    assert_equal(1, rules.length)
+    assert_equal(ExcludeRule, rules[0].class)
+    assert_equal("foo = bar", rules[0].criteria.to_s)
+    assert_equal("", rules[0].description)
+  end
+  
+  def test_rules_two
+    data = <<-RULES.outdent
+      exclude foo = bar
+        should foo equal bar, we want to exclude that combination
+      
+      exclude bar = foo
+        as well, if bar equals foo,
+        that case has got to go
+    RULES
+    rules = Rules.new(data)
+    assert_equal(2, rules.length)
+    assert_equal(ExcludeRule, rules[0].class)
+    assert_equal("foo = bar", rules[0].criteria.to_s)
+    assert_equal("should foo equal bar, we want to exclude that combination", rules[0].description)
+
+    assert_equal(ExcludeRule, rules[1].class)
+    assert_equal("bar = foo", rules[1].criteria.to_s)
+    assert_equal("as well, if bar equals foo,\nthat case has got to go", rules[1].description)
+  end
+  
+  def test_exclude_rule_parsing
+    data = <<-RULES.outdent
+      exclude foo = bar
+        should foo equal bar, we want to exclude that combination
+    RULES
+    rule = ExcludeRule.new(data)
+    assert_equal("foo = bar", rule.criteria.to_s)
+    assert_equal(["foo"], rule.criteria.set_names)
+    assert_equal(["bar"], rule.criteria.set_values)
+    assert_equal("should foo equal bar, we want to exclude that combination", rule.description)
+    
+  end
+  
+  def test_rules_set_name_not_found
+    sets = Sets.new("set.a: foo, bar\nset.b: fu, bahr")
+    data = <<-RULES.outdent
+      exclude set_a = bar AND set_b = barh
+        should foo equal bar, we want to exclude that combination
+    RULES
+    begin
+      rules = Rules.new(data, [sets])
+      fail('should throw')
+    rescue ParserException => e
+      assert_equal("Invalid set name <set_a> in rule <set_a = bar AND set_b = barh>. Valid set names are <set.a, set.b>.", e.message)
+    end
+  end
+
+  def test_rules_set_value_not_found
+    sets = Sets.new("set a: foo, bar\nset b: fu, bahr")
+    data = <<-RULES.outdent
+      exclude set a = bar AND set b = barh
+        should foo equal bar, we want to exclude that combination
+    RULES
+    begin
+      rules = Rules.new(data, [sets])
+      fail('should throw')
+    rescue ParserException => e
+      assert_equal("Invalid set value <barh> in rule <set a = bar AND set b = barh>. Valid set values for <set b> are <fu, bahr>.", e.message)
+    end
+  end
+  
+  class TestCriteria < Test::Unit::TestCase
+    def test_simple_equality
+      crit = Criteria.new("a = b")
+      assert_equal(['a'], crit.set_names)
+      assert_equal(['b'], crit.set_values)
+      assert_equal(true, crit.match({'a' => 'b'}))
+      assert_equal(false, crit.match({'a' => 'c'}))
+      assert_equal(false, crit.match({'b' => 'a'}))
+      assert_equal(true, crit.match({'a' => 'b', 'f' => 'g'}))
+    end
+    
+    def test_boolean_and
+      crit = Criteria.new("a = b AND c == d")
+      assert_equal(['a', 'c'], crit.set_names)
+      assert_equal(['b', 'd'], crit.set_values)
+      assert_equal(true, crit.match({'a' => 'b', 'c' => 'd'}))
+      assert_equal(false, crit.match({'a' => 'd', 'c' => 'b'}))
+      assert_equal(true, crit.match({'c' => 'd', 'a' => 'b'}))
+      assert_equal(false, crit.match({'a' => 'b'}))
+      assert_equal(false, crit.match({'c' => 'd'}))
+      assert_equal(false, crit.match({'a' => 'b', 'd' => 'c'}))
+      assert_equal(false, crit.match({'c' => 'd', 'b' => 'a'}))
+      
+      # not case sensitive
+      assert_equal(false, crit.match({'A' => 'b', 'c' => 'd'}))
+      assert_equal(false, crit.match({'a' => 'B', 'c' => 'd'}))
+      assert_equal(false, crit.match({'a' => 'b', 'C' => 'd'}))
+      assert_equal(false, crit.match({'a' => 'b', 'c' => 'D'}))
+    end
+    
+    def test_invalid_boolean_and
+      begin
+        crit = Criteria.new("a = b AND a = d")
+        fail("should throw")
+      rescue ParserException => e
+        assert_equal("Rule cannot have the same set <a> equal to different values <b, d>", e.message)
+      end
+
+      begin
+        crit = Criteria.new("a = b AND a = d AND a = c")
+        fail("should throw")
+      rescue ParserException => e
+        # in this case, the exception is figured out before the a = c can be parsed
+        assert_equal("Rule cannot have the same set <a> equal to different values <b, d>", e.message)
+      end
+    end
+  end
+  
+  class TestRulesOnSets < Test::Unit::TestCase
+    def test_simple
+      sets = Sets.new("a: 1, 2\nb: 3, 4")
+      rules = Rules.new("exclude a = 1\nexclude b=4", [sets])
+      assert_equal([['2', '3']], rules.combinations)
+      assert_equal(['a', 'b'], rules.titles)
+    end
+  end
+end
+
+

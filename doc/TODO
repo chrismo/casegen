@@ -1,0 +1,26 @@
+- OR not supported yet.
+- Nested booleans not supported yet.
+- performance problems
+
+    two problems: formatting table is very slow, too many iterations. Sets agent can get
+    col widths easy, but it may not be passed to the console agent, so may need to support
+    "console(rules, sets)" syntax
+
+    the actual enum product call is fairly quick, but the rules are 3x as slow. Need a way
+    to maybe hold off on generating the combinations and then hook in with a block to filter
+    them as they're being made - save another run through the whole set.
+
+- support for "assign ... when ..."
+- if condition specified has an incorrect value, notify user
+- don't require comma AND SPACE in set lists ... ? (This is currently that way to allow thousands separators in values)
+
+- this case:
+      exclude Cl = Ser         AND Rec = K12RF(1.01)
+      exclude Cl = Ser         AND Rec = G2IR(white)
+      exclude Cl = Num         AND Herf(11)
+
+  blows up without a meaningful error
+
+- meaningful exceptions still are exceptions, and you have a full stacktrace - make it purty.
+
+- LICENSE text (auto-update LICENSE header in each source file...)
