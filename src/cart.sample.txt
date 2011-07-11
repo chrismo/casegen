@@ -31,4 +31,3 @@ exclude ship to country = US AND bill to country = Outside US
 
 console(rules)
 ----------
-

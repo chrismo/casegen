@@ -11,4 +11,3 @@ exclude operator = / AND second number = 0
 
 console(rules)
 --------------
-

@@ -104,26 +104,34 @@ class TestParser < Test::Unit::TestCase
       
       sample_data
     CASEDATA
-  
-    parser = Parser.new(data)
-    assert_equal(1, parser.agents.length)
-    sample = parser.agents[0]
-    assert_equal(SampleAgent, sample.class)
-    assert_equal(nil, sample.data)
-    assert_equal([], sample.reference_agents)
+
+    Parser.new(data)
+    fail("should have thrown")
+  rescue ParserException => e
+    assert_equal("Expected hyphen line after the agent declaration for <SampleAgent>", e.message)
   end
   
-  def test_parse_just_agent
+  def test_parse_agent_name_without_dash_delimiter
     data = <<-CASEDATA.outdent
       sample
     CASEDATA
   
-    parser = Parser.new(data)
-    assert_equal(1, parser.agents.length)
-    sample = parser.agents[0]
-    assert_equal(SampleAgent, sample.class)
-    assert_equal(nil, sample.data)
-    assert_equal([], sample.referenced_agents)
+    Parser.new(data)
+    fail("should have thrown")
+  rescue ParserException => e
+    assert_equal("Expected hyphen line after the agent declaration for <SampleAgent>", e.message)
+  end
+
+  def test_parse_agent_name_without_dash_delimiter_and_empty_line_to_start
+    data = <<-CASEDATA.outdent
+
+      sample
+    CASEDATA
+
+    Parser.new(data)
+    fail("should have thrown")
+  rescue ParserException => e
+    assert_equal("Expected hyphen line after the agent declaration for <SampleAgent>", e.message)
   end
 
   def test_parse_just_agent_with_underline
@@ -136,8 +144,8 @@ class TestParser < Test::Unit::TestCase
     assert_equal(1, parser.agents.length)
     sample = parser.agents[0]
     assert_equal(SampleAgent, sample.class)
-    assert_equal(nil, sample.data)
-    assert_equal([], sample.referenced_agents)
+    assert_equal("", sample.data)
+    assert_equal([], sample.reference_agents)
   end
 
   def test_parse_just_agent_with_empty_data
@@ -151,8 +159,8 @@ class TestParser < Test::Unit::TestCase
     assert_equal(1, parser.agents.length)
     sample = parser.agents[0]
     assert_equal(SampleAgent, sample.class)
-    assert_equal(nil, sample.data)
-    assert_equal([], sample.referenced_agents)
+    assert_equal("", sample.data)
+    assert_equal([], sample.reference_agents)
   end
 
   def test_parse_invalid_agent
@@ -163,7 +171,7 @@ class TestParser < Test::Unit::TestCase
     CASEDATA
   
     begin
-      parser = Parser.new(data)
+      Parser.new(data)
       fail("should throw")
     rescue ParserException
       # expected
@@ -178,15 +186,11 @@ class TestParser < Test::Unit::TestCase
     CASEDATA
   
     begin
-      parser = Parser.new(data)
+      Parser.new(data)
       fail("should throw")
     rescue ParserException
       # expected
     end
-  end
-
-  def test_parse_should_not_be_so_strict
-    fail("change parser to allow empty agents")
   end
 end
  

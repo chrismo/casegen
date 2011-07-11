@@ -18,4 +18,3 @@ exclude role = standard AND authorization code = valid AND submit enabled = fals
 ruby_array(rules)
 -------------
 DataSubmitCase
-

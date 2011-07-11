@@ -87,10 +87,6 @@ produces this output:
 
 ## FAQ
 
-_I don't get any output when I try your sample input file?_
-
-Make sure there's a newline at the end of your data. In the above example input file, make sure the last line is "-------\n" not "--------"
-
 How can I use this lib inside another Ruby file, instead of having a separate input file?
 
 sample.rb:
@@ -116,4 +112,4 @@ sample.rb:
 
 _Are there other tools similar to CaseGen?_
 
-<a href="http://code.google.com/p/tcases/">tcases</a> is one to check out.
+<a href="http://code.google.com/p/tcases/">tcases</a> is one to check out. Another is <a href="http://www.satisfice.com/tools.shtml">AllPairs</a> by James Bach.
