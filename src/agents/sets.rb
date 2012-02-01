@@ -76,9 +76,7 @@ module CLabs::CaseGen
     end
     
     def set_by_name(setname)
-      result = nil
-      @sets.each do |set| result = set if set.name =~ /#{setname}/ end
-      result
+      @sets.detect do |set| set.name =~ /#{Regexp.escape(setname)}/ end
     end
     
   end

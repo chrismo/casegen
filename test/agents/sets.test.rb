@@ -20,6 +20,13 @@ class TestParsing < Test::Unit::TestCase
     assert_equal("foo list", cases.sets[1].name)
     assert_equal(["a", "b", "c"], cases.sets[1].data)
   end
+
+  def test_set_by_name_matching
+    # may seem obvious, but the regex matching used at one point would get confused when a name was reused in sets
+    sets = Sets.new("foo bar: 1, 2\nbar quux: 3, 4")
+    set = sets.set_by_name('bar quux')
+    assert_equal 'bar quux', set.name
+  end
 end
 
 class TestCombinations < Test::Unit::TestCase
