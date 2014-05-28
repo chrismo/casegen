@@ -1,2 +1,4 @@
 .idea/.name
 .idea/workspace.xml
+bin/
+pkg/

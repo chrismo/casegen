@@ -143,7 +143,7 @@ module CLabs
 
     class CaseGen
       def CaseGen.version
-        "1.2.1"
+        '1.3.0'
       end
 
       def initialize(data)
@@ -170,8 +170,8 @@ module CLabs
         put_banner
 
         if ARGV[0].nil? || !File.exists?(ARGV[0])
-          puts "Case file required: #{File.basename(__FILE__)} [case filename]. For example:"
-          puts "  #{File.basename(__FILE__)} cases.txt"
+          puts "Case file required: #{File.basename($0)} [case filename]. For example:"
+          puts "  #{File.basename($0)} cases.txt"
           puts
           exit
         end
