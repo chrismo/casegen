@@ -143,7 +143,7 @@ module CLabs
 
     class CaseGen
       def CaseGen.version
-        '1.3.0'
+        '2.0.0'
       end
 
       def initialize(data)
