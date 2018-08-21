@@ -1,11 +1,5 @@
 require 'singleton'
 
-class Fixnum
-  def even?
-    self.divmod(2)[1] == 0
-  end
-end
-
 class String
   def outdent
     a = $1 if match(/\A(\s*)(.*\n)(?:\1.*\n|\n)*\z/)

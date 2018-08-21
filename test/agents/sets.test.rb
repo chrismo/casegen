@@ -1,13 +1,12 @@
-$LOAD_PATH << "#{File.dirname(__FILE__)}/.."
-$LOAD_PATH << "#{File.dirname(__FILE__)}/../../src/agents"
-require 'test/unit'
+$LOAD_PATH << "#{__dir__}/../../lib/agents"
+require 'minitest/autorun'
 require 'sets'
 
 include CLabs::CaseGen
 
-class TestParsing < Test::Unit::TestCase
+class TestParsing < Minitest::Test
   def test_sets_default
-    data = <<-CASEDATA.outdent
+    data = <<~CASEDATA
       bar: 1, 2, 3,456.98
        foo list:a, b, c
     CASEDATA
@@ -29,7 +28,7 @@ class TestParsing < Test::Unit::TestCase
   end
 end
 
-class TestCombinations < Test::Unit::TestCase
+class TestCombinations < Minitest::Test
   def test_combos_2_by_2
     sets = Sets.new("a: 1, 2\nb:3, 4")
     assert_equal([['1', '3'], ['1', '4'], ['2', '3'], ['2', '4']], sets.combinations)
@@ -44,9 +43,9 @@ class TestCombinations < Test::Unit::TestCase
   end
 end
 
-class TestRulesParsing < Test::Unit::TestCase
+class TestRulesParsing < Minitest::Test
   def test_rules_single
-    data = <<-RULES.outdent
+    data = <<~RULES
       exclude foo = bar
     RULES
     rules = Rules.new(data)
@@ -57,7 +56,7 @@ class TestRulesParsing < Test::Unit::TestCase
   end
   
   def test_rules_two
-    data = <<-RULES.outdent
+    data = <<~RULES
       exclude foo = bar
         should foo equal bar, we want to exclude that combination
       
@@ -77,7 +76,7 @@ class TestRulesParsing < Test::Unit::TestCase
   end
   
   def test_exclude_rule_parsing
-    data = <<-RULES.outdent
+    data = <<~RULES
       exclude foo = bar
         should foo equal bar, we want to exclude that combination
     RULES
@@ -91,12 +90,12 @@ class TestRulesParsing < Test::Unit::TestCase
   
   def test_rules_set_name_not_found
     sets = Sets.new("set.a: foo, bar\nset.b: fu, bahr")
-    data = <<-RULES.outdent
+    data = <<~RULES
       exclude set_a = bar AND set_b = barh
         should foo equal bar, we want to exclude that combination
     RULES
     begin
-      rules = Rules.new(data, [sets])
+      Rules.new(data, [sets])
       fail('should throw')
     rescue ParserException => e
       assert_equal("Invalid set name <set_a> in rule <set_a = bar AND set_b = barh>. Valid set names are <set.a, set.b>.", e.message)
@@ -105,19 +104,19 @@ class TestRulesParsing < Test::Unit::TestCase
 
   def test_rules_set_value_not_found
     sets = Sets.new("set a: foo, bar\nset b: fu, bahr")
-    data = <<-RULES.outdent
+    data = <<~RULES
       exclude set a = bar AND set b = barh
         should foo equal bar, we want to exclude that combination
     RULES
     begin
-      rules = Rules.new(data, [sets])
+      Rules.new(data, [sets])
       fail('should throw')
     rescue ParserException => e
       assert_equal("Invalid set value <barh> in rule <set a = bar AND set b = barh>. Valid set values for <set b> are <fu, bahr>.", e.message)
     end
   end
   
-  class TestCriteria < Test::Unit::TestCase
+  class TestCriteria < Minitest::Test
     def test_simple_equality
       crit = Criteria.new("a = b")
       assert_equal(['a'], crit.set_names)
@@ -149,14 +148,14 @@ class TestRulesParsing < Test::Unit::TestCase
     
     def test_invalid_boolean_and
       begin
-        crit = Criteria.new("a = b AND a = d")
+        Criteria.new("a = b AND a = d")
         fail("should throw")
       rescue ParserException => e
         assert_equal("Rule cannot have the same set <a> equal to different values <b, d>", e.message)
       end
 
       begin
-        crit = Criteria.new("a = b AND a = d AND a = c")
+        Criteria.new("a = b AND a = d AND a = c")
         fail("should throw")
       rescue ParserException => e
         # in this case, the exception is figured out before the a = c can be parsed
@@ -165,7 +164,7 @@ class TestRulesParsing < Test::Unit::TestCase
     end
   end
   
-  class TestRulesOnSets < Test::Unit::TestCase
+  class TestRulesOnSets < Minitest::Test
     def test_simple
       sets = Sets.new("a: 1, 2\nb: 3, 4")
       rules = Rules.new("exclude a = 1\nexclude b=4", [sets])
@@ -174,12 +173,12 @@ class TestRulesParsing < Test::Unit::TestCase
     end
   end
 
-  class TestRubyCaseArray < Test::Unit::TestCase
+  class TestRubyCaseArray < Minitest::Test
     def test_default_case_name
       sets = Sets.new("a: 1, 2\nb:3, 4")
       out = MockStdOut.new
       RubyArrayOutput.new("", [sets], out)
-      expected = <<-TEXT.outdent
+      expected = <<~TEXT
         Case = Struct.new(:a, :b)
 
         cases = [Case.new("1", "3"),
@@ -194,7 +193,7 @@ class TestRulesParsing < Test::Unit::TestCase
       sets = Sets.new("a: 1, 2\nb:3, 4")
       out = MockStdOut.new
       RubyArrayOutput.new("DataSubmitCase", [sets], out)
-      expected = <<-TEXT.outdent
+      expected = <<~TEXT
         DataSubmitCase = Struct.new(:a, :b)
 
         cases = [DataSubmitCase.new("1", "3"),

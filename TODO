@@ -23,4 +23,4 @@
 
 - meaningful exceptions still are exceptions, and you have a full stacktrace - make it purty.
 
-- LICENSE text (auto-update LICENSE header in each source file...)
+- LICENSE of enum lib contents.

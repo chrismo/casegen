@@ -1,10 +1,10 @@
-$LOAD_PATH << "#{File.dirname(__FILE__)}/../src"
-require 'test/unit'
+$LOAD_PATH << "#{__dir__}/../lib"
+require 'minitest/autorun'
 require 'casegen'
 
 include CLabs::CaseGen
 
-class TestAgents < Test::Unit::TestCase
+class TestAgents < Minitest::Test
   def teardown
     Agents.instance.clear
   end
@@ -48,14 +48,14 @@ class Foo < Agent
   end
 end
 
-class TestParser < Test::Unit::TestCase
+class TestParser < Minitest::Test
   def setup
     Agents.instance.register(SampleAgent)
     Agents.instance.register(Foo)
   end
 
   def test_parse
-    data = <<-CASEDATA.outdent
+    data = <<~CASEDATA
       sample
       ------
       sample_data
@@ -91,7 +91,7 @@ class TestParser < Test::Unit::TestCase
   end
   
   def test_parse_no_sets
-    data = <<-CASEDATA.outdent
+    data = <<~CASEDATA
     CASEDATA
 
     parser = Parser.new(data)
@@ -99,7 +99,7 @@ class TestParser < Test::Unit::TestCase
   end
 
   def test_parse_agent_with_missing_hyphen_line
-    data = <<-CASEDATA.outdent
+    data = <<~CASEDATA
       sample
       
       sample_data
@@ -112,7 +112,7 @@ class TestParser < Test::Unit::TestCase
   end
   
   def test_parse_agent_name_without_dash_delimiter
-    data = <<-CASEDATA.outdent
+    data = <<~CASEDATA
       sample
     CASEDATA
   
@@ -123,7 +123,7 @@ class TestParser < Test::Unit::TestCase
   end
 
   def test_parse_agent_name_without_dash_delimiter_and_empty_line_to_start
-    data = <<-CASEDATA.outdent
+    data = <<~CASEDATA
 
       sample
     CASEDATA
@@ -135,7 +135,7 @@ class TestParser < Test::Unit::TestCase
   end
 
   def test_parse_just_agent_with_underline
-    data = <<-CASEDATA.outdent
+    data = <<~CASEDATA
       sample
       -
     CASEDATA
@@ -149,7 +149,7 @@ class TestParser < Test::Unit::TestCase
   end
 
   def test_parse_just_agent_with_empty_data
-    data = <<-CASEDATA.outdent
+    data = <<~CASEDATA
       sample
       -
 
@@ -164,7 +164,7 @@ class TestParser < Test::Unit::TestCase
   end
 
   def test_parse_invalid_agent
-    data = <<-CASEDATA.outdent
+    data = <<~CASEDATA
       sermple
       ------
       sample_data
@@ -179,7 +179,7 @@ class TestParser < Test::Unit::TestCase
   end
   
   def test_parse_invalid_referenced_agent
-    data = <<-CASEDATA.outdent
+    data = <<~CASEDATA
       sample(fu)
       ------
       sample_data
