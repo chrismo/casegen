@@ -99,30 +99,30 @@ input file?
 
 sample.rb:
 
-		require "bundler/inline"
+	require "bundler/inline"
         
         gemfile do
           source "https://rubygems.org"
           gem "casegen", "~> 2.0"
         end
         
-		require 'casegen'
+	require 'casegen'
 		
-		CLabs::CaseGen::CaseGen.new(DATA.read)
+	CLabs::CaseGen::CaseGen.new(DATA.read)
 		
-		__END__
+	__END__
 		
-		sets
-		----
-		a: 1, 2
-		b: 3, 4
+	sets
+	----
+	a: 1, 2
+	b: 3, 4
 		
-		rules(sets)
-		-----------
-		exclude a = 1
+	rules(sets)
+	-----------
+	exclude a = 1
 		
-		console(rules)
-		--------------
+	console(rules)
+	--------------
 		
 
 ### Are there other tools similar to CaseGen?
