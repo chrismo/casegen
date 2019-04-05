@@ -1,0 +1,6 @@
+#!/usr/bin/env ruby
+
+gem 'casegen'
+require 'casegen'
+
+CLabs::CaseGen::CaseGen.new(File.read(ARGV[0]))

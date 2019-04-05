@@ -9,7 +9,7 @@ GEM
   specs:
     minitest (5.11.3)
     rake (12.3.1)
-    tablesmith (0.3.1)
+    tablesmith (0.4.1)
       text-table
     text-table (1.2.4)
 
@@ -22,4 +22,4 @@ DEPENDENCIES
   rake
 
 BUNDLED WITH
-   1.16.1
+   1.17.3
