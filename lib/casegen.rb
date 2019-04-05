@@ -1,11 +1,5 @@
 require 'singleton'
 
-class Fixnum
-  def even?
-    self.divmod(2)[1] == 0
-  end
-end
-
 class String
   def outdent
     a = $1 if match(/\A(\s*)(.*\n)(?:\1.*\n|\n)*\z/)
@@ -143,7 +137,7 @@ module CLabs
 
     class CaseGen
       def CaseGen.version
-        '1.3.0'
+        '2.0.0'
       end
 
       def initialize(data)

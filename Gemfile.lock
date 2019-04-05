@@ -1,10 +1,25 @@
+PATH
+  remote: .
+  specs:
+    casegen (2.0.0)
+      tablesmith
+
 GEM
   remote: https://rubygems.org/
   specs:
-    rake (10.3.2)
+    minitest (5.11.3)
+    rake (12.3.1)
+    tablesmith (0.4.1)
+      text-table
+    text-table (1.2.4)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
+  casegen!
+  minitest
   rake
+
+BUNDLED WITH
+   1.17.3
