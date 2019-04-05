@@ -13,33 +13,33 @@ Enumerable tools 1.6
 
 =end
 
-module Enumerable
-
-  def inject n
-    each { |i|
-      n = yield n, i
-    }
-    n
-  end
-  alias :accumulate :inject
-  
-  def sum
-    if block_given?
-      inject(0) { |n, i| n + yield(i) }
-    else
-      inject(0) { |n, i| n + i }
-    end
-  end
-  
-  def product
-    if block_given?
-      inject(1) { |n, i| n * yield(i) }
-    else
-      inject(1) { |n, i| n * i }
-    end
-  end
-  
-end
+# module Enumerable
+#
+#   def inject n
+#     each { |i|
+#       n = yield n, i
+#     }
+#     n
+#   end
+#   alias :accumulate :inject
+#
+#   def sum
+#     if block_given?
+#       inject(0) { |n, i| n + yield(i) }
+#     else
+#       inject(0) { |n, i| n + i }
+#     end
+#   end
+#
+#   def product
+#     if block_given?
+#       inject(1) { |n, i| n * yield(i) }
+#     else
+#       inject(1) { |n, i| n * i }
+#     end
+#   end
+#
+# end
 
 if __FILE__ == $0
 

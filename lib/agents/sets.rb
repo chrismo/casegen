@@ -1,6 +1,7 @@
 require "#{File.dirname(__FILE__)}/../casegen"
 $LOAD_PATH << "#{File.expand_path(File.join(File.dirname(__FILE__), 'sets'))}"
 require 'enum/op'
+require 'tablesmith'
 
 class String
   def to_u
@@ -255,40 +256,16 @@ module CLabs::CaseGen
       "casegen:console"
     end
 
-    def initialize(data, reference_agents)
+    def initialize(data, reference_agents, io=STDOUT)
       @data = data
       @agents = reference_agents
-      table = formatted_table([@agents[0].titles] + @agents[0].combinations)
-      table.each do |ary|
-        puts ary.join(' | ')
-      end
-      puts
+      table = [@agents[0].titles] + @agents[0].combinations
+      io.puts table.to_table.pretty_inspect
+      io.puts
       @agents[0].each do |rule|
-        puts rule.data
-        puts
+        io.puts rule.data
+        io.puts
       end if @agents[0].is_a?(Rules)
-    end
-
-    def formatted_table(combinations)
-      col_widths = []
-      formatted_tuples = []
-      combinations.each do |tuple|
-        col = 0
-        tuple.each do |item|
-          col_widths[col] = item.to_s.length if col_widths[col].to_i < item.to_s.length
-          col += 1
-        end
-      end
-
-      combinations.each do |tuple|
-        col = 0
-        formatted_tuples << tuple.collect { |item|
-          formatted = item.to_s.ljust(col_widths[col]) if !col_widths[col].nil?
-          col += 1
-          formatted
-        }
-      end
-      formatted_tuples
     end
   end
 
