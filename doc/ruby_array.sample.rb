@@ -1,3 +1,9 @@
+require_relative '../lib/casegen'
+
+CLabs::CaseGen::CaseGen.new(DATA.read)
+
+__END__
+
 sets
 ----
 role: admin, standard
