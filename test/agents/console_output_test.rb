@@ -3,9 +3,9 @@ require_relative '../../lib/agents/sets.rb'
 
 FakeAgent = Struct.new(:titles, :combinations)
 
-include CLabs::CaseGen
-
 class TestConsoleOutput < Minitest::Test
+  include CLabs::CaseGen
+
   def test_simple_output
     data = nil
     agents = [

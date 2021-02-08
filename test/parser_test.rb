@@ -2,21 +2,21 @@ $LOAD_PATH << "#{__dir__}/../lib"
 require 'minitest/autorun'
 require 'casegen'
 
-include CLabs::CaseGen
-
-class SampleAgent < Agent
+class SampleAgent < CLabs::CaseGen::Agent
   def SampleAgent.agent_id
     "sample"
   end
 end
 
-class Foo < Agent
+class Foo < CLabs::CaseGen::Agent
   def Foo.agent_id
     "foo"
   end
 end
 
 class TestParser < Minitest::Test
+  include CLabs::CaseGen
+
   def setup
     Agents.instance.register(SampleAgent)
     Agents.instance.register(Foo)

@@ -216,7 +216,7 @@ module CLabs::CaseGen
     end
 
     def combinations
-      return @combinations if !@combinations.nil?
+      return @combinations if defined?(@combinations) && !@combinations.nil?
       if @agents[0].class == Sets
         agent = @agents[0]
         @combinations = []

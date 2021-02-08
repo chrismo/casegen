@@ -2,9 +2,9 @@ $LOAD_PATH << "#{__dir__}/../../lib/agents"
 require 'minitest/autorun'
 require 'sets'
 
-include CLabs::CaseGen
-
 class TestParsing < Minitest::Test
+  include CLabs::CaseGen
+
   def test_sets_default
     data = <<~CASEDATA
       bar: 1, 2, 3,456.98
@@ -29,6 +29,8 @@ class TestParsing < Minitest::Test
 end
 
 class TestCombinations < Minitest::Test
+  include CLabs::CaseGen
+
   def test_combos_2_by_2
     sets = Sets.new("a: 1, 2\nb:3, 4")
     assert_equal([['1', '3'], ['1', '4'], ['2', '3'], ['2', '4']], sets.combinations)
@@ -44,6 +46,8 @@ class TestCombinations < Minitest::Test
 end
 
 class TestRulesParsing < Minitest::Test
+  include CLabs::CaseGen
+
   def test_rules_single
     data = <<~RULES
       exclude foo = bar
@@ -117,6 +121,8 @@ class TestRulesParsing < Minitest::Test
   end
   
   class TestCriteria < Minitest::Test
+    include CLabs::CaseGen
+
     def test_simple_equality
       crit = Criteria.new("a = b")
       assert_equal(['a'], crit.set_names)
@@ -165,6 +171,8 @@ class TestRulesParsing < Minitest::Test
   end
   
   class TestRulesOnSets < Minitest::Test
+    include CLabs::CaseGen
+
     def test_simple
       sets = Sets.new("a: 1, 2\nb: 3, 4")
       rules = Rules.new("exclude a = 1\nexclude b=4", [sets])
@@ -174,6 +182,8 @@ class TestRulesParsing < Minitest::Test
   end
 
   class TestRubyCaseArray < Minitest::Test
+    include CLabs::CaseGen
+
     def test_default_case_name
       sets = Sets.new("a: 1, 2\nb:3, 4")
       out = MockStdOut.new
@@ -223,5 +233,3 @@ class TestRulesParsing < Minitest::Test
     end
   end
 end
-
-
