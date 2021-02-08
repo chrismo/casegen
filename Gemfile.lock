@@ -8,7 +8,7 @@ GEM
   remote: https://rubygems.org/
   specs:
     minitest (5.14.3)
-    rake (12.3.1)
+    rake (13.0.3)
     tablesmith (0.6.2)
       text-table
     text-table (1.2.4)
