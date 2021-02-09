@@ -70,7 +70,11 @@ module CLabs::CaseGen
           combo_sets, expect_sets = @sets.partition { |set| set.class == CLabs::CaseGen::Set }
           arrays = combo_sets.map { |set| set.data.map { |d| {set.name => d} } }
           combos = all(*arrays)
-          combos.each { |combo| expect_sets.each { |expect_set| combo << {expect_set.name => ''} } }
+          combos.tap { |o| p o }
+          combos.map do |combo|
+            expect_sets.each { |expect_set| combo << {expect_set.name => ''} }
+            combo.reduce({}) { |h, d| h.merge(d) }
+          end
         end
     end
 
@@ -250,21 +254,20 @@ module CLabs::CaseGen
     end
 
     def combinations
-      return @combinations if defined?(@combinations) && !@combinations.nil?
-      if @agents[0].class == Sets
-        agent = @agents[0]
-        @combinations = []
-        agent.combinations.each do |combo|
-          delete = false
-
-          # TODO: don't make Rules make the hash like this, have Sets do it this way.
-          combo_hash = combo.reduce({}) {|h, d| h.merge(d) }
-          @rules.each { |rule| delete ||= rule.process_combo(combo_hash) }
-          @combinations << combo_hash.values unless delete
+      @combinations ||=
+        begin
+          if @agents[0].class == Sets
+            agent = @agents[0]
+            combinations = []
+            agent.combinations.each do |combo|
+              request_delete = @rules.select { |rule| rule.process_combo(combo) }
+              combinations << combo.values unless request_delete.any?
+            end
+            combinations
+          else
+            []
+          end
         end
-        return @combinations
-      end
-      return []
     end
 
     def titles
@@ -321,14 +324,7 @@ module CLabs::CaseGen
       guts_header = 'cases = ['
       guts = ''
       agent.combinations.each do |combo|
-        values = combo.map do |datum|
-          case datum
-          when Hash
-            datum.first.last
-          else
-            datum
-          end
-        end
+        values = combo.values
         guts << ",\n#{' ' * guts_header.length}" if !guts.empty?
         guts << "#{@struct_name}.new#{values.inspect.gsub(/\[/, '(').gsub(/\]/, ')')}"
       end

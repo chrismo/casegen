@@ -48,10 +48,10 @@ class TestCombinations < Minitest::Test
   def test_combos_2_by_2
     sets = Sets.new("a: 1, 2\nb:3, 4")
     assert_equal([
-                   [{"a" => "1"}, {"b" => "3"}],
-                   [{"a" => "1"}, {"b" => "4"}],
-                   [{"a" => "2"}, {"b" => "3"}],
-                   [{"a" => "2"}, {"b" => "4"}]
+                   {"a" => "1", "b" => "3"},
+                   {"a" => "1", "b" => "4"},
+                   {"a" => "2", "b" => "3"},
+                   {"a" => "2", "b" => "4"}
                  ], sets.combinations)
     assert_equal(%w[a b], sets.titles)
   end
@@ -59,12 +59,12 @@ class TestCombinations < Minitest::Test
   def test_combos_2_by_3
     sets = Sets.new("a: 1, 2\nb:3, 4, 5")
     assert_equal([
-                   [{"a" => "1"}, {"b" => "3"}],
-                   [{"a" => "1"}, {"b" => "4"}],
-                   [{"a" => "1"}, {"b" => "5"}],
-                   [{"a" => "2"}, {"b" => "3"}],
-                   [{"a" => "2"}, {"b" => "4"}],
-                   [{"a" => "2"}, {"b" => "5"}]
+                   {"a" => "1", "b" => "3"},
+                   {"a" => "1", "b" => "4"},
+                   {"a" => "1", "b" => "5"},
+                   {"a" => "2", "b" => "3"},
+                   {"a" => "2", "b" => "4"},
+                   {"a" => "2", "b" => "5"}
                  ], sets.combinations)
     assert_equal(%w[a b], sets.titles)
   end
@@ -73,12 +73,12 @@ class TestCombinations < Minitest::Test
     sets = Sets.new("a: 1, 2\nb:3, 4, 5\nexpect:")
     assert_equal(%w[a b expect], sets.titles)
     assert_equal([
-                   [{"a" => "1"}, {"b" => "3"}, {"expect" => ""}],
-                   [{"a" => "1"}, {"b" => "4"}, {"expect" => ""}],
-                   [{"a" => "1"}, {"b" => "5"}, {"expect" => ""}],
-                   [{"a" => "2"}, {"b" => "3"}, {"expect" => ""}],
-                   [{"a" => "2"}, {"b" => "4"}, {"expect" => ""}],
-                   [{"a" => "2"}, {"b" => "5"}, {"expect" => ""}]
+                   {"a" => "1", "b" => "3", "expect" => ""},
+                   {"a" => "1", "b" => "4", "expect" => ""},
+                   {"a" => "1", "b" => "5", "expect" => ""},
+                   {"a" => "2", "b" => "3", "expect" => ""},
+                   {"a" => "2", "b" => "4", "expect" => ""},
+                   {"a" => "2", "b" => "5", "expect" => ""}
                  ], sets.combinations)
   end
 end
