@@ -127,35 +127,18 @@ class TestRulesParsing < Minitest::Test
     assert_equal(["foo"], rule.criteria.set_names)
     assert_equal(["bar"], rule.criteria.set_values)
     assert_equal("should foo equal bar, we want to exclude that combination", rule.description)
-
   end
 
-  def test_rules_set_name_not_found
-    sets = Sets.new("set.a: foo, bar\nset.b: fu, bahr")
+  def test_expect_when_rule_parse
     data = <<~RULES
-      exclude set_a = bar AND set_b = barh
-        should foo equal bar, we want to exclude that combination
+      when a = 1 AND b = 3
+        expect = adding will equal 4
     RULES
-    begin
-      Rules.new(data, [sets])
-      fail('should throw')
-    rescue ParserException => e
-      assert_equal("Invalid set name <set_a> in rule <set_a = bar AND set_b = barh>. Valid set names are <set.a, set.b>.", e.message)
-    end
-  end
-
-  def test_rules_set_value_not_found
-    sets = Sets.new("set a: foo, bar\nset b: fu, bahr")
-    data = <<~RULES
-      exclude set a = bar AND set b = barh
-        should foo equal bar, we want to exclude that combination
-    RULES
-    begin
-      Rules.new(data, [sets])
-      fail('should throw')
-    rescue ParserException => e
-      assert_equal("Invalid set value <barh> in rule <set a = bar AND set b = barh>. Valid set values for <set b> are <fu, bahr>.", e.message)
-    end
+    rule = WhenExpectRule.new(data)
+    assert_equal("a = 1 AND b = 3", rule.criteria.to_s)
+    assert_equal(%w[a b], rule.criteria.set_names)
+    assert_equal(%w[1 3], rule.criteria.set_values)
+    assert_equal("expect = adding will equal 4", rule.description)
   end
 
   class TestCriteria < Minitest::Test
@@ -216,6 +199,50 @@ class TestRulesParsing < Minitest::Test
       rules = Rules.new("exclude a = 1\nexclude b=4", [sets])
       assert_equal([%w[2 3]], rules.combinations)
       assert_equal(%w[a b], rules.titles)
+    end
+
+    def test_rules_set_name_not_found
+      sets = Sets.new("set.a: foo, bar\nset.b: fu, bahr")
+      data = <<~RULES
+        exclude set_a = bar AND set_b = barh
+          should foo equal bar, we want to exclude that combination
+      RULES
+      begin
+        Rules.new(data, [sets])
+        fail('should throw')
+      rescue ParserException => e
+        assert_equal("Invalid set name <set_a> in rule <set_a = bar AND set_b = barh>. Valid set names are <set.a, set.b>.", e.message)
+      end
+    end
+
+    def test_rules_set_value_not_found
+      sets = Sets.new("set a: foo, bar\nset b: fu, bahr")
+      data = <<~RULES
+        exclude set a = bar AND set b = barh
+          should foo equal bar, we want to exclude that combination
+      RULES
+      begin
+        Rules.new(data, [sets])
+        fail('should throw')
+      rescue ParserException => e
+        assert_equal("Invalid set value <barh> in rule <set a = bar AND set b = barh>. Valid set values for <set b> are <fu, bahr>.", e.message)
+      end
+    end
+
+    def test_expect_when_rule_parse
+      sets = Sets.new("a: 1, 2\nb: 3, 4\nexpect: ")
+      data = <<~RULES
+        when a = 1 AND b = 3
+          expect = adding will equal 4
+      RULES
+      rules = Rules.new(data, [sets])
+      assert_equal([
+                     ["1", "3", "adding will equal 4"],
+                     ["1", "4", ""],
+                     ["2", "3", ""],
+                     ["2", "4", ""]
+                   ], rules.combinations)
+      assert_equal(%w[a b expect], rules.titles)
     end
   end
 

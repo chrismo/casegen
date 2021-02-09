@@ -52,7 +52,7 @@ module CLabs::CaseGen
       sets.each do |set_array|
         name, data_array = [set_array[0], set_array[1].split(/, /)]
         new_set =
-          if /expect/i.match?(name)
+          if /\Aexpect/i.match?(name)
             ExpectSet.new(name, data_array)
           else
             Set.new(name, data_array)
@@ -148,10 +148,6 @@ module CLabs::CaseGen
   end
 
   class ExcludeRule < Rule
-    def type_description
-      "exclude"
-    end
-
     def ExcludeRule.regexp
       /^exclude/i
     end
@@ -159,6 +155,33 @@ module CLabs::CaseGen
     def ExcludeRule.create(rule_data)
       return ExcludeRule.new(rule_data) if rule_data =~ regexp
       return nil
+    end
+
+    def process_combo(combo)
+      return criteria.match(combo)
+    end
+  end
+
+  class WhenExpectRule < Rule
+    def self.regexp
+      /\Awhen/i
+    end
+
+    def self.create(rule_data)
+      return WhenExpectRule.new(rule_data) if rule_data =~ regexp
+      return nil
+    end
+
+    def parse_rule
+      super
+
+      @value = description.scan(/\A\s*expect\s*=\s*(.*)/).join
+    end
+
+    def process_combo(combo)
+      combo["expect"] = @value if criteria.match(combo)
+
+      return false
     end
   end
 
@@ -232,20 +255,12 @@ module CLabs::CaseGen
         agent = @agents[0]
         @combinations = []
         agent.combinations.each do |combo|
-          combo = combo.map { |h| h.first.last }
           delete = false
-          combo_hash = {}
-          i = 0
-          # combo is an array of values, in the same order of the set_titles.
-          # combo_hash will have set names matched with set values
-          agent.set_titles.each do |title|
-            combo_hash[title] = combo[i]
-            i += 1
-          end
-          @rules.each do |rule|
-            delete |= rule.criteria.match(combo_hash)
-          end
-          @combinations << combo if !delete
+
+          # TODO: don't make Rules make the hash like this, have Sets do it this way.
+          combo_hash = combo.reduce({}) {|h, d| h.merge(d) }
+          @rules.each { |rule| delete ||= rule.process_combo(combo_hash) }
+          @combinations << combo_hash.values unless delete
         end
         return @combinations
       end
