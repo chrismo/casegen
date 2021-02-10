@@ -70,7 +70,6 @@ module CLabs::CaseGen
           combo_sets, expect_sets = @sets.partition { |set| set.class == CLabs::CaseGen::Set }
           arrays = combo_sets.map { |set| set.data.map { |d| {set.name => d} } }
           combos = all(*arrays)
-          combos.tap { |o| p o }
           combos.map do |combo|
             expect_sets.each { |expect_set| combo << {expect_set.name => ''} }
             combo.reduce({}) { |h, d| h.merge(d) }
@@ -139,6 +138,7 @@ module CLabs::CaseGen
 
     def initialize(rule_data)
       @data = rule_data
+      @hide_output = false
       parse_rule
     end
 
@@ -148,6 +148,10 @@ module CLabs::CaseGen
       criteria_data.strip!
       @criteria = Criteria.new(criteria_data)
       @description = (@description.join("\n") + "\n").outdent.strip
+    end
+
+    def hide_output?
+      @hide_output
     end
   end
 
@@ -183,7 +187,10 @@ module CLabs::CaseGen
     end
 
     def process_combo(combo)
-      combo["expect"] = @value if criteria.match(combo)
+      if criteria.match(combo)
+        combo["expect"] = @value
+        @hide_output = true
+      end
 
       return false
     end
@@ -261,6 +268,8 @@ module CLabs::CaseGen
             combinations = []
             agent.combinations.each do |combo|
               request_delete = @rules.select { |rule| rule.process_combo(combo) }
+              # if it's an expect table, and there's no rule for it, have an option to
+              # output that rule template.
               combinations << combo.values unless request_delete.any?
             end
             combinations
@@ -292,8 +301,11 @@ module CLabs::CaseGen
       table = [@agents[0].titles] + @agents[0].combinations
       io.puts table.to_table.pretty_inspect
       io.puts
+
+      # this is a dorky coupling to this specific class. All the effort
+      # put into being generic throughout this gem is a bit lost right here.
       @agents[0].each do |rule|
-        io.puts rule.data
+        io.puts rule.data unless rule.hide_output?
         io.puts
       end if @agents[0].is_a?(Rules)
     end
