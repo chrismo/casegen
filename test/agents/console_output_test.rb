@@ -53,7 +53,6 @@ class TestConsoleOutput < Minitest::Test
 
       a = 1
 
-
     _
     assert_equal expected, sio.string
   end

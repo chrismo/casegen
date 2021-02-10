@@ -311,8 +311,10 @@ module CLabs::CaseGen
       # this is a dorky coupling to this specific class. All the effort
       # put into being generic throughout this gem is a bit lost right here.
       @agents[0].each do |rule|
-        io.puts rule.data unless rule.hide_output?
-        io.puts
+        unless rule.hide_output?
+          io.puts rule.data
+          io.puts
+        end
       end if @agents[0].is_a?(Rules)
     end
   end
