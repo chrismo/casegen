@@ -29,7 +29,6 @@ module CLabs::CaseGen
   end
 
   class ExpectSet < Set
-
   end
 
   class Sets < Agent
@@ -52,6 +51,7 @@ module CLabs::CaseGen
       sets.each do |set_array|
         name, data_array = [set_array[0], set_array[1].split(/, /)]
         new_set =
+          # Refactor: don't couple the specifics in here
           if /\Aexpect/i.match?(name)
             ExpectSet.new(name, data_array)
           else
@@ -153,6 +153,10 @@ module CLabs::CaseGen
     def hide_output?
       @hide_output
     end
+
+    def is_match?(combo)
+      raise "Implement in subclass"
+    end
   end
 
   class ExcludeRule < Rule
@@ -165,8 +169,8 @@ module CLabs::CaseGen
       return nil
     end
 
-    def process_combo(combo)
-      return criteria.match(combo)
+    def is_match?(combo)
+      criteria.match(combo) ? :exclude : :no_match
     end
   end
 
@@ -186,13 +190,11 @@ module CLabs::CaseGen
       @value = description.scan(/\A\s*expect\s*=\s*(.*)/).join
     end
 
-    def process_combo(combo)
-      if criteria.match(combo)
-        combo["expect"] = @value
-        @hide_output = true
-      end
-
-      return false
+    def is_match?(combo)
+      criteria.match(combo).tap do |result|
+        @hide_output ||= result
+        combo["expect"] = @value if result
+      end ? :match : :no_match
     end
   end
 
@@ -227,6 +229,7 @@ module CLabs::CaseGen
 
     def validate_rules
       @agents.each do |agent|
+        # Refactor: don't couple in a specific class name
         if agent.class == Sets
           @rules.each do |rule|
             rule.criteria.equalities.each_pair do |set_name, set_value|
@@ -263,14 +266,17 @@ module CLabs::CaseGen
     def combinations
       @combinations ||=
         begin
+          # Refactor: don't couple to a specific class here
           if @agents[0].class == Sets
             agent = @agents[0]
             combinations = []
             agent.combinations.each do |combo|
-              request_delete = @rules.select { |rule| rule.process_combo(combo) }
-              # if it's an expect table, and there's no rule for it, have an option to
-              # output that rule template.
-              combinations << combo.values unless request_delete.any?
+              results = @rules.map { |rule| rule.is_match?(combo) }
+              combinations << combo.values unless results.any?(:exclude)
+              # If we want to create WhenExpect rules when nothing matches we
+              # could do it here `if results.all?(:no_match)` but figuring out
+              # the design so we don't just couple in specific behavior here is
+              # challenging my brain right now.
             end
             combinations
           else

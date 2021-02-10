@@ -244,6 +244,28 @@ class TestRulesParsing < Minitest::Test
                    ], rules.combinations)
       assert_equal(%w[a b expect], rules.titles)
     end
+
+    def test_expect_when_create_rule_templates
+      skip("nice to have in the future")
+
+      sets = Sets.new("a: 1, 2\nb: 3\nexpect: ")
+      data = <<~RULES
+        when a = 1 AND b = 3
+          expect = adding will equal 4
+      RULES
+      rules = Rules.new(data, [sets])
+      assert_equal([
+                     ["1", "3", "adding will equal 4"],
+                     ["2", "3", ""],
+                   ], rules.combinations)
+      assert_equal(%w[a b expect], rules.titles)
+      rules_data = rules.each.to_a.map(&:data)
+      expected = [
+        "when a = 1 AND b = 3\n  expect = adding will equal 4",
+        "when a = 1 AND b = 2\n  expect ="
+      ]
+      assert_equal(expected, rules_data)
+    end
   end
 
   class TestRubyCaseArray < Minitest::Test

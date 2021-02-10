@@ -47,7 +47,7 @@ module CLabs
         # rather than return nil and allow the client to get bumfuzzled if 
         # they forget to check for nil, let's blow up and tell them how to
         # not let it happen again
-        raise AgentException.new("Requested an agent that does not exist. You can query for existance with .id_registered?")
+        raise AgentException.new("Requested an agent that does not exist. You can query for existence with .id_registered?")
       end
 
       def id_registered?(id)
@@ -137,7 +137,7 @@ module CLabs
 
     class CaseGen
       def CaseGen.version
-        '2.0.1'
+        '3.0.0'
       end
 
       def initialize(data)
