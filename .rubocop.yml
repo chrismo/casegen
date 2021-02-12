@@ -1,10 +1,13 @@
 require:
   - rubocop-performance
-  # - rubocop_lineup
+  - rubocop-rake
+  - rubocop-rspec
 
 AllCops:
   TargetRubyVersion: 2.5
   NewCops: disable
+  Exclude:
+    - bin/*
 
 Layout/ClassStructure:
   Enabled: true
@@ -23,6 +26,13 @@ Layout/ClassStructure:
 
 Layout/DotPosition:
   EnforcedStyle: trailing
+
+Layout/LineLength:
+  Enabled: false
+  Max: 120
+  AllowHeredoc: true
+  AllowURI: true
+  URISchemes: http, https
 
 Layout/MultilineMethodCallIndentation:
   Enabled: false
@@ -49,13 +59,6 @@ Metrics/ClassLength:
     - 'Rakefile'
     - 'spec/**/*.rb'
     - 'test/**/*.rb'
-
-Metrics/LineLength:
-  Enabled: false
-  Max: 120
-  AllowHeredoc: true
-  AllowURI: true
-  URISchemes: http, https
 
 Metrics/MethodLength:
   CountComments: false  # count full line comments?
