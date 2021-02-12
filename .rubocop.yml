@@ -3,7 +3,8 @@ require:
   # - rubocop_lineup
 
 AllCops:
-  TargetRubyVersion: 2.6
+  TargetRubyVersion: 2.5
+  NewCops: disable
 
 Layout/ClassStructure:
   Enabled: true
@@ -41,7 +42,7 @@ Metrics/BlockLength:
     - '**/*.rake'
     - 'spec/**/*.rb'
     - 'test/**/*.rb'
-  ExcludedMethods: ['included', 'namespace']
+  IgnoredMethods: ['included', 'namespace']
 
 Metrics/ClassLength:
   Exclude:

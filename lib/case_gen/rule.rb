@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module CaseGen
   class Rule
     attr_reader :description, :criteria

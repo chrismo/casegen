@@ -1,4 +1,6 @@
-require "tablesmith"
+# frozen_string_literal: true
+
+require 'tablesmith'
 
 module CaseGen
   class Executor

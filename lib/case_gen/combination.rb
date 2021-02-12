@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module CaseGen
   class Combination
     def initialize(hash_pairs)

@@ -1,11 +1,12 @@
+# frozen_string_literal: true
+
 require 'bundler/gem_tasks'
 
-require 'rake/testtask'
+begin
+  require 'rspec/core/rake_task'
 
-desc 'Run tests'
-Rake::TestTask.new do |t|
-  t.pattern = 'test/**/*test*.rb'
-  # t.verbose = true
+  RSpec::Core::RakeTask.new(:spec)
+
+  task default: :spec
+rescue LoadError
 end
-
-task default: :test
