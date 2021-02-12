@@ -20,12 +20,15 @@ module CLabs::CaseGen
     end
 
     def strip_data
-      @data.collect! do |datum| datum.strip end
+      @data.collect! { |datum| datum.strip }
     end
 
     def values
       @data
     end
+  end
+
+  class ExpectSet < Set
   end
 
   class Sets < Agent
@@ -35,7 +38,7 @@ module CLabs::CaseGen
       "casegen:sets"
     end
 
-    def initialize(data, reference_agents=nil)
+    def initialize(data, reference_agents = nil)
       @data = data
       @sets = []
       parse_sets
@@ -46,16 +49,32 @@ module CLabs::CaseGen
       set_data = @data.scan(/:(.*)/)
       sets = set_names.flatten.zip(set_data.flatten)
       sets.each do |set_array|
-        @sets << Set.new(set_array[0], set_array[1].split(/, /))
+        name, data_array = [set_array[0], set_array[1].split(/, /)]
+        new_set =
+          # Refactor: don't couple the specifics in here
+          if /\Aexpect/i.match?(name)
+            ExpectSet.new(name, data_array)
+          else
+            Set.new(name, data_array)
+          end
+        @sets << new_set
       end
       generate_combinations
     end
 
     def generate_combinations
-      arrays = []
-      @set_titles = []
-      @sets.each do |set| arrays << set.data; @set_titles << set.name end
-      @combinations = all(*arrays)
+      @combinations =
+        begin
+          @set_titles = []
+          @sets.each { |set| @set_titles << set.name }
+          combo_sets, expect_sets = @sets.partition { |set| set.class == CLabs::CaseGen::Set }
+          arrays = combo_sets.map { |set| set.data.map { |d| {set.name => d} } }
+          combos = all(*arrays)
+          combos.map do |combo|
+            expect_sets.each { |expect_set| combo << {expect_set.name => ''} }
+            combo.reduce({}) { |h, d| h.merge(d) }
+          end
+        end
     end
 
     def titles
@@ -63,23 +82,16 @@ module CLabs::CaseGen
     end
 
     def all(*args)
-      result = []
-      EnumerableOperator::Product.new(*args).each { |tuple|
-        result << tuple
-      }
-      result
+      EnumerableOperator::Product.new(*args).to_a
     end
 
     def set_names
-      names = []
-      @sets.each do |set| names << set.name end
-      names
+      @sets.map(&:name)
     end
 
     def set_by_name(setname)
-      @sets.detect do |set| set.name =~ /#{Regexp.escape(setname)}/ end
+      @sets.detect { |set| set.name =~ /#{Regexp.escape(setname)}/ }
     end
-
   end
 
   class Criteria
@@ -126,6 +138,7 @@ module CLabs::CaseGen
 
     def initialize(rule_data)
       @data = rule_data
+      @hide_output = false
       parse_rule
     end
 
@@ -136,13 +149,17 @@ module CLabs::CaseGen
       @criteria = Criteria.new(criteria_data)
       @description = (@description.join("\n") + "\n").outdent.strip
     end
+
+    def hide_output?
+      @hide_output
+    end
+
+    def is_match?(combo)
+      raise "Implement in subclass"
+    end
   end
 
   class ExcludeRule < Rule
-    def type_description
-      "exclude"
-    end
-
     def ExcludeRule.regexp
       /^exclude/i
     end
@@ -151,6 +168,34 @@ module CLabs::CaseGen
       return ExcludeRule.new(rule_data) if rule_data =~ regexp
       return nil
     end
+
+    def is_match?(combo)
+      criteria.match(combo) ? :exclude : :no_match
+    end
+  end
+
+  class WhenExpectRule < Rule
+    def self.regexp
+      /\Awhen/i
+    end
+
+    def self.create(rule_data)
+      return WhenExpectRule.new(rule_data) if rule_data =~ regexp
+      return nil
+    end
+
+    def parse_rule
+      super
+
+      @value = description.scan(/\A\s*expect\s*=\s*(.*)/).join
+    end
+
+    def is_match?(combo)
+      criteria.match(combo).tap do |result|
+        @hide_output ||= result
+        combo["expect"] = @value if result
+      end ? :match : :no_match
+    end
   end
 
   class Rules < Agent
@@ -158,7 +203,7 @@ module CLabs::CaseGen
       "casegen:rules"
     end
 
-    def initialize(data, reference_agents=[])
+    def initialize(data, reference_agents = [])
       @data = data
       @agents = reference_agents
       @rules = []
@@ -184,18 +229,21 @@ module CLabs::CaseGen
 
     def validate_rules
       @agents.each do |agent|
+        # Refactor: don't couple in a specific class name
         if agent.class == Sets
           @rules.each do |rule|
             rule.criteria.equalities.each_pair do |set_name, set_value|
               set = agent.set_by_name(set_name)
               if set.nil?
-                raise ParserException.new("Invalid set name <#{set_name}> " +
-                  "in rule <#{rule.criteria}>. Valid set names are <#{agent.set_names.join(', ')}>.")
+                raise ParserException.new(
+                  "Invalid set name <#{set_name}> " +
+                    "in rule <#{rule.criteria}>. Valid set names are <#{agent.set_names.join(', ')}>.")
               end
               if !set.values.include?(set_value)
-                raise ParserException.new("Invalid set value <#{set_value}> " +
-                  "in rule <#{rule.criteria}>. Valid set values for <#{set.name}> " +
-                  "are <#{set.values.join(', ')}>.")
+                raise ParserException.new(
+                  "Invalid set value <#{set_value}> " +
+                    "in rule <#{rule.criteria}>. Valid set values for <#{set.name}> " +
+                    "are <#{set.values.join(', ')}>.")
               end
             end
           end
@@ -216,28 +264,25 @@ module CLabs::CaseGen
     end
 
     def combinations
-      return @combinations if defined?(@combinations) && !@combinations.nil?
-      if @agents[0].class == Sets
-        agent = @agents[0]
-        @combinations = []
-        agent.combinations.each do |combo|
-          delete = false
-          combo_hash = {}
-          i = 0
-          # combo is an array of values, in the same order of the set_titles.
-          # combo_hash will have set names matched with set values
-          agent.set_titles.each do |title|
-            combo_hash[title] = combo[i]
-            i += 1
+      @combinations ||=
+        begin
+          # Refactor: don't couple to a specific class here
+          if @agents[0].class == Sets
+            agent = @agents[0]
+            combinations = []
+            agent.combinations.each do |combo|
+              results = @rules.map { |rule| rule.is_match?(combo) }
+              combinations << combo.values unless results.any?(:exclude)
+              # If we want to create WhenExpect rules when nothing matches we
+              # could do it here `if results.all?(:no_match)` but figuring out
+              # the design so we don't just couple in specific behavior here is
+              # challenging my brain right now.
+            end
+            combinations
+          else
+            []
           end
-          @rules.each do |rule|
-            delete |= rule.criteria.match(combo_hash)
-          end
-          @combinations << combo if !delete
         end
-        return @combinations
-      end
-      return []
     end
 
     def titles
@@ -256,15 +301,20 @@ module CLabs::CaseGen
       "casegen:console"
     end
 
-    def initialize(data, reference_agents, io=STDOUT)
+    def initialize(data, reference_agents, io = STDOUT)
       @data = data
       @agents = reference_agents
       table = [@agents[0].titles] + @agents[0].combinations
       io.puts table.to_table.pretty_inspect
       io.puts
+
+      # this is a dorky coupling to this specific class. All the effort
+      # put into being generic throughout this gem is a bit lost right here.
       @agents[0].each do |rule|
-        io.puts rule.data
-        io.puts
+        unless rule.hide_output?
+          io.puts rule.data
+          io.puts
+        end
       end if @agents[0].is_a?(Rules)
     end
   end
@@ -274,12 +324,12 @@ module CLabs::CaseGen
       "casegen:ruby_array"
     end
 
-    def initialize(data, reference_agents, io=STDOUT)
+    def initialize(data, reference_agents, io = STDOUT)
       @io = io
       @struct_name = "Case"
       @struct_name = data if !data.empty?
       @agents = reference_agents
-      @agents.each do |agent| execute(agent) end
+      @agents.each { |agent| execute(agent) }
     end
 
     def execute(agent)
@@ -294,8 +344,9 @@ module CLabs::CaseGen
       guts_header = 'cases = ['
       guts = ''
       agent.combinations.each do |combo|
+        values = combo.values
         guts << ",\n#{' ' * guts_header.length}" if !guts.empty?
-        guts << "#{@struct_name}.new#{combo.inspect.gsub(/\[/, '(').gsub(/\]/, ')')}"
+        guts << "#{@struct_name}.new#{values.inspect.gsub(/\[/, '(').gsub(/\]/, ')')}"
       end
       @io.print(struct_header)
       @io.print(struct)

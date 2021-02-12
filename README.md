@@ -130,3 +130,8 @@ sample.rb:
 <a href="http://code.google.com/p/tcases/">tcases</a> is one to check out.
 Another is <a href="http://www.satisfice.com/tools.shtml">AllPairs</a> by James
 Bach.
+          
+### Hat Tip
+
+To @JoelVanderWerf (https://github.com/vjoel) for his almost long lost enum
+library. See http://redshift.sourceforge.net/enum/.
