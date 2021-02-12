@@ -10,6 +10,25 @@ sets = {
   bill_to_country: ['US', 'Outside US']
 }
 
+# TODO: lambda rules cannot be output**. Outputting the exclusion rules is nice
+# since these are still things that should be tested. In some scenarios, just
+# outputting the excluded combinations could be good, but in more complex
+# setups, the exclusion rules are used to remove large swaths of cases that are
+# too costly to verify.
+#
+# TODO: ... but anyway, should output the string versions.
+#
+# ** Yes I'm sure. Dug into pry and its magic - it can show-source on a lambda
+# entered into pry on the fly, but it uses pry magic to capture things like
+# that. Doing it from a Hash I couldn't get to work.
+#
+# Now, if we switched this here to subclassing something, then presumably we
+# could get an output of the lambda or method ... though I dunno if it'd be as
+# tidy. And ... what's the big diff between a string and a lambda? Well, syntax
+# highlighting, but you don't get much more than that since there's no proper
+# context inside the lambda to do things like proper discovery of methods, etc.
+# at least in RubyMine.
+
 rules = {
   exclude: [
     {
