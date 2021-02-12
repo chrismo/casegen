@@ -1,6 +1,10 @@
-require_relative '../lib/casegen'
+# frozen_string_literal: true
 
-CLabs::CaseGen::CaseGen.new(DATA.read)
+require_relative '../lib/case_gen'
+
+raise "This doesn't currently work. Do I even want to keep it?"
+
+# CLabs::CaseGen::CaseGen.new(DATA.read)
 
 __END__
 
