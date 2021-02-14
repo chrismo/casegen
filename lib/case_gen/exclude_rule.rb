@@ -2,21 +2,20 @@
 
 module CaseGen
   class ExcludeRule
-    def initialize(rule, combos)
-      @rule = rule
-      @combos = combos
+    def initialize(rule_data)
+      @description = rule_data[:description]
+      @criteria = rule_data[:criteria]
     end
 
-    def apply
-      @combos.delete_if do |combo|
-        criteria = @rule.criteria
-        case criteria
+    def apply(combos)
+      combos.delete_if do |combo|
+        case @criteria
         when String
-          combo.instance_eval(criteria)
+          combo.instance_eval(@criteria)
         when Proc
-          combo.instance_exec(&criteria)
+          combo.instance_exec(&@criteria)
         else
-          raise "Unknown rule criteria class: #{criteria.class}"
+          raise "Unknown rule criteria class: #{@criteria.class}"
         end
       end
     end

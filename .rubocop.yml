@@ -67,6 +67,9 @@ Metrics/MethodLength:
 Naming/MemoizedInstanceVariableName:
   Enabled: false
 
+RSpec/DescribeClass:
+  Enabled: false
+
 Style/BlockComments:
   Enabled: false
 

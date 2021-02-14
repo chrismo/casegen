@@ -29,8 +29,7 @@ module CaseGen
       @rules.each do |type, rules|
         klass = CaseGen.const_get("#{type.to_s.capitalize}Rule")
         rules.each do |rule_data|
-          rule = CaseGen::Rule.new(rule_data[:description], rule_data[:criteria])
-          klass.new(rule, @combos).apply
+          klass.new(rule_data).apply(@combos)
         end
       end
     end

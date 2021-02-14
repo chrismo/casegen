@@ -55,4 +55,9 @@ rules = {
   ]
 }
 
-puts CaseGen::Executor.new(sets, rules).to_table
+if __FILE__ == $PROGRAM_NAME
+  puts CaseGen::Executor.new(sets, rules).to_table
+else
+  Fixtures.sets = sets
+  Fixtures.rules = rules
+end

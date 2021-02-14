@@ -100,3 +100,9 @@ RSpec.configure do |config|
   Kernel.srand config.seed
 =end
 end
+
+class Fixtures
+  class << self
+    attr_accessor :sets, :rules
+  end
+end
