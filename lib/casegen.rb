@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require_relative 'case_gen/rule_description'
 require_relative 'case_gen/set'
 require_relative 'case_gen/exclude_rule'
 require_relative 'case_gen/expect_rule'
@@ -9,7 +10,7 @@ require_relative 'case_gen/output'
 
 module CaseGen
   def self.generate(sets, rules, output_options = [])
-    generator = CaseGen::Generator.new(sets, rules)
+    generator = CaseGen::Generator.new(sets, rules, output_options)
     output = CaseGen::Output.new(generator)
     output_options.each do |opt|
       output.send("#{opt}=", true)

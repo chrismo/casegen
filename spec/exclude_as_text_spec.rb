@@ -3,7 +3,7 @@
 require 'spec_helper'
 require_relative '../doc/pricing.sample'
 
-RSpec.describe 'Pricing Sample' do
+RSpec.describe 'Exclude as text' do
   let(:expected_combo_table) do
     <<~_
       +----------+----------+-------+--------+
@@ -42,7 +42,8 @@ RSpec.describe 'Pricing Sample' do
   end
 
   let(:generator) do
-    CaseGen::Generator.new(Fixtures.sets, Fixtures.rules)
+    fix = Fixtures[:pricing]
+    CaseGen::Generator.new(fix[:sets], fix[:rules])
   end
 
   it 'output only combos table' do

@@ -5,12 +5,10 @@ module CaseGen
     attr_reader :names
 
     def initialize(hash_pairs)
-      @hash_pairs = hash_pairs
       @names = hash_pairs.map do |h|
         k = h.first.first
         v = h.first.last
-        instance_variable_set("@#{k}", v)
-        self.class.attr_accessor k
+        append(k, v)
         k
       end
     end
@@ -21,6 +19,12 @@ module CaseGen
           h[ivar] = instance_variable_get("@#{ivar}")
         end
       end
+    end
+
+    def append(key, value)
+      @names << key if defined?(@names)
+      instance_variable_set("@#{key}", value)
+      self.class.attr_accessor key
     end
   end
 end

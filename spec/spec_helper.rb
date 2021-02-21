@@ -102,7 +102,12 @@ RSpec.configure do |config|
 end
 
 class Fixtures
-  class << self
-    attr_accessor :sets, :rules
+  def self.add(name, sets, rules)
+    @fixtures ||= {}
+    @fixtures[name] = {sets: sets, rules: rules}
+  end
+
+  def self.[](name)
+    @fixtures[name]
   end
 end

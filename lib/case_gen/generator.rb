@@ -6,11 +6,12 @@ module CaseGen
   class Generator
     attr_reader :sets, :rules, :combos
 
-    def initialize(sets, rules)
+    def initialize(sets, rules, options = [])
       @sets = sets.map do |title, values|
         CaseGen::Set.new(title, values)
       end
       @rules = rules
+      @options = options
       @combos = generate_combinations
       apply_rules
     end
@@ -23,9 +24,7 @@ module CaseGen
 
     def generate_combinations
       hash_pairs = @sets.map(&:hash_pairs)
-      product_of(hash_pairs).map do |c|
-        Combination.new(c)
-      end
+      product_of(hash_pairs).map { |c| Combination.new(c) }
     end
 
     def product_of(sets)
@@ -37,7 +36,7 @@ module CaseGen
       @rules.each do |type, rules|
         klass = CaseGen.const_get("#{type.to_s.capitalize}Rule")
         rules.each do |rule_data|
-          klass.new(rule_data).apply(@combos)
+          klass.new(rule_data, @options).apply(@combos)
         end
       end
     end

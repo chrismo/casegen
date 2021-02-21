@@ -1,6 +1,10 @@
+# frozen_string_literal: true
+
 module CaseGen
   class Output
-    attr_accessor :exclude_as_text
+    include RuleDescription
+
+    attr_accessor :exclude_as_text, :exclude_inline
 
     def initialize(generator)
       @generator = generator
@@ -20,12 +24,6 @@ module CaseGen
         [rule[:criteria], "  #{rule_description(rule)}", '']
       end
       (header + body).join("\n")
-    end
-
-    def rule_description(rule)
-      keys = %i[description note reason]
-      key = (rule.keys & keys).first
-      rule[key]
     end
   end
 end

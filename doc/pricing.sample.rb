@@ -48,6 +48,5 @@ output = [:exclude_as_text]
 if __FILE__ == $PROGRAM_NAME
   puts CaseGen.generate(sets, rules, output)
 else
-  Fixtures.sets = sets
-  Fixtures.rules = rules
+  Fixtures.add(:pricing, sets, rules)
 end

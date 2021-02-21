@@ -2,9 +2,10 @@
 
 module CaseGen
   class ExpectRule
-    def initialize(rule_data)
+    def initialize(rule_data, options = [])
       @rule_data = rule_data
       @ignore_keys = %i[description reason note]
+      @options = options
     end
 
     def apply(combos)
