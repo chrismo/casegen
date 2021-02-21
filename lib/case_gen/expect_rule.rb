@@ -4,7 +4,7 @@ module CaseGen
   class ExpectRule
     def initialize(rule_data, options = [])
       @rule_data = rule_data
-      @ignore_keys = %i[description reason note]
+      @ignore_keys = %i[description reason note index]
       @options = options
     end
 

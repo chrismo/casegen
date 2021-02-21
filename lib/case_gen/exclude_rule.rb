@@ -7,6 +7,7 @@ module CaseGen
     def initialize(rule_data, options = [])
       @description = rule_description(rule_data)
       @criteria = rule_data[:criteria]
+      @index = rule_data[:index]
       @options = options
     end
 
@@ -28,24 +29,32 @@ module CaseGen
     private
 
     def process_matches(combos, matches)
-      if @options.include?(:exclude_inline)
+      # REFACTOR: replace conditional with polymorphism
+      if @options.include?(:exclude_inline) || @options.include?(:exclude_inline_footnotes)
         process_exclude_inline_matches(combos, matches)
       else
         combos.delete_if { |combo| matches.include?(combo) }
       end
     end
 
-    # CANDO: replace conditional with polymorphism
     def process_exclude_inline_matches(combos, matches)
       combos.each do |combo|
         next unless matches.include?(combo)
         next if combo.names.include?(:exclude)
 
-        combo.append(:exclude, @description)
+        combo.append(:exclude, exclude_description)
         expect_keys = combo.names.select { |name| combo.send(name) == :expect }
         expect_keys.each do |expect_key|
           combo.send("#{expect_key}=", '')
         end
+      end
+    end
+
+    def exclude_description
+      if @options.include?(:exclude_inline_footnotes)
+        "[#{@index}]"
+      else
+        @description
       end
     end
   end

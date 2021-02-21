@@ -35,7 +35,8 @@ module CaseGen
     def apply_rules
       @rules.each do |type, rules|
         klass = CaseGen.const_get("#{type.to_s.capitalize}Rule")
-        rules.each do |rule_data|
+        rules.each_with_index do |rule_data, idx|
+          rule_data[:index] = idx + 1
           klass.new(rule_data, @options).apply(@combos)
         end
       end
