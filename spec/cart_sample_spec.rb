@@ -38,7 +38,7 @@ RSpec.describe 'Cart Sample' do
   end
 
   it 'works' do
-    require_relative '../doc/cart.sample'
+    require_relative '../doc/cart'
 
     fix = Fixtures[:cart]
     expect(CaseGen::Generator.new(fix[:sets], fix[:rules]).combos_table.to_s).to eq expected

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
-require_relative '../doc/pricing.sample'
+require_relative '../doc/pricing'
 
 RSpec.describe 'Exclude inline with footnotes' do
   let(:expected_table) do

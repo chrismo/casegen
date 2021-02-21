@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
-require_relative '../doc/pricing.sample'
+require_relative '../doc/pricing'
 
 RSpec.describe 'Exclude as text' do
   let(:expected_combo_table) do
