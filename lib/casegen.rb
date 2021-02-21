@@ -4,7 +4,16 @@ require_relative 'case_gen/set'
 require_relative 'case_gen/exclude_rule'
 require_relative 'case_gen/expect_rule'
 require_relative 'case_gen/combination'
-require_relative 'case_gen/executor'
+require_relative 'case_gen/generator'
+require_relative 'case_gen/output'
 
 module CaseGen
+  def self.generate(sets, rules, output_options = [])
+    generator = CaseGen::Generator.new(sets, rules)
+    output = CaseGen::Output.new(generator)
+    output_options.each do |opt|
+      output.send("#{opt}=", true)
+    end
+    output.to_s
+  end
 end

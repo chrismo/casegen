@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative '../lib/case_gen'
+require_relative '../lib/casegen'
 
 sets = {
   subtotal: [25, 75, 200],
@@ -43,8 +43,10 @@ rules = {
   ]
 }
 
+output = [:exclude_as_text]
+
 if __FILE__ == $PROGRAM_NAME
-  puts CaseGen::Executor.new(sets, rules).to_table
+  puts CaseGen.generate(sets, rules, output)
 else
   Fixtures.sets = sets
   Fixtures.rules = rules

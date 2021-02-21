@@ -3,7 +3,9 @@
 require 'tablesmith'
 
 module CaseGen
-  class Executor
+  class Generator
+    attr_reader :sets, :rules, :combos
+
     def initialize(sets, rules)
       @sets = sets.map do |title, values|
         CaseGen::Set.new(title, values)
@@ -12,6 +14,12 @@ module CaseGen
       @combos = generate_combinations
       apply_rules
     end
+
+    def combos_table
+      @combos.map(&:hash_row).to_table
+    end
+
+    private
 
     def generate_combinations
       hash_pairs = @sets.map(&:hash_pairs)
@@ -32,10 +40,6 @@ module CaseGen
           klass.new(rule_data).apply(@combos)
         end
       end
-    end
-
-    def to_table
-      @combos.map(&:hash_row).to_table
     end
   end
 end

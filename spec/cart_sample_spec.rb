@@ -40,6 +40,6 @@ RSpec.describe 'Cart Sample' do
   it 'works' do
     require_relative '../doc/cart.sample'
 
-    expect(CaseGen::Executor.new(Fixtures.sets, Fixtures.rules).to_table.to_s).to eq expected
+    expect(CaseGen::Generator.new(Fixtures.sets, Fixtures.rules).combos_table.to_s).to eq expected
   end
 end

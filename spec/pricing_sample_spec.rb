@@ -1,9 +1,10 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
+require_relative '../doc/pricing.sample'
 
 RSpec.describe 'Pricing Sample' do
-  let(:expected) do
+  let(:expected_combo_table) do
     <<~_
       +----------+----------+-------+--------+
       | subtotal | discount | promo | total  |
@@ -19,9 +20,39 @@ RSpec.describe 'Pricing Sample' do
     _
   end
 
-  it 'works' do
-    require_relative '../doc/pricing.sample'
+  let(:expected_exclude_as_text) do
+    <<~_
+      exclude
+      -------
+      subtotal < 100 && discount == '20%'
+        Total must be above $100 to apply the 20% discount
 
-    expect(CaseGen::Executor.new(Fixtures.sets, Fixtures.rules).to_table.to_s).to eq expected
+      (subtotal < 50) && discount == '10%'
+        Total must be above $50 to apply the 10% discount
+
+      discount != '20%' && subtotal == 200
+        Orders over 100 automatically get 20% discount
+
+      discount != '10%' && subtotal == 75
+        Orders between 50 and 100 automatically get 10% discount
+
+      discount == '20%' && promo != 'none'
+        20% discount cannot be combined with promo
+    _
+  end
+
+  let(:generator) do
+    CaseGen::Generator.new(Fixtures.sets, Fixtures.rules)
+  end
+
+  it 'output only combos table' do
+    output = CaseGen::Output.new(generator)
+    expect(output.to_s).to eq expected_combo_table
+  end
+
+  it 'outputs with exclude as text' do
+    output = CaseGen::Output.new(generator)
+    output.exclude_as_text = true
+    expect(output.to_s).to eq "#{expected_combo_table}\n#{expected_exclude_as_text}"
   end
 end
