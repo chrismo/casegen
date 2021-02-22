@@ -44,7 +44,7 @@ RSpec.describe 'Exclude inline' do
   let(:rules) { Fixtures[:pricing][:rules] }
 
   it 'output' do
-    result = CaseGen.generate(sets, rules, [:exclude_inline])
+    result = CaseGen.generate(sets, rules, :exclude_inline)
     expect(result).to eq expected_table
   end
 end

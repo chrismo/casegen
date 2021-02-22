@@ -5,11 +5,11 @@ module CaseGen
     include ComboMatcher
     include RuleDescription
 
-    def initialize(rule_data, options = [])
+    def initialize(rule_data, output_type = :exclude)
       @rule_data = rule_data
       @description = rule_description(rule_data)
       @criteria = rule_data[:criteria]
-      @options = options
+      @output_type = output_type
     end
 
     def apply(combos)
@@ -47,9 +47,10 @@ module CaseGen
     end
 
     def exclude_description
-      if @options.include?(:exclude_inline_footnotes)
+      case @output_type
+      when :exclude_inline_footnotes
         "[#{@rule_data[:index]}]"
-      elsif @options.include?(:exclude_inline) || @options.include?(:exclude_as_table)
+      when :exclude_inline, :exclude_as_table
         @description
       end
     end

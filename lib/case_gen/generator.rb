@@ -6,12 +6,12 @@ module CaseGen
   class Generator
     attr_reader :sets, :rules, :combos, :exclusions
 
-    def initialize(sets, rules, options = [])
+    def initialize(sets, rules, output_type = :exclude)
       @sets = sets.map do |title, values|
         CaseGen::Set.new(title, values)
       end
       @rules = rules
-      @options = options
+      @output_type = output_type
       @combos = generate_combinations
       process_rules
     end
@@ -46,19 +46,19 @@ module CaseGen
         klass = CaseGen.const_get("#{type.to_s.capitalize}Rule")
         rules.each_with_index do |rule_data, idx|
           rule_data[:index] = idx + 1
-          klass.new(rule_data, @options).apply(@combos)
+          klass.new(rule_data, @output_type).apply(@combos)
         end
       end
     end
 
     def process_exclusions
-      return if @options.include?(:exclude_inline)
-      return if @options.include?(:exclude_inline_footnotes)
+      return if @output_type == :exclude_inline
+      return if @output_type == :exclude_inline_footnotes
 
       exclude, include = @combos.partition { |combo| combo.names.include?(:exclude) }
 
       @combos = include
-      @exclusions = @options.include?(:exclude_as_table) ? exclude : []
+      @exclusions = @output_type == :exclude_as_table ? exclude : []
     end
   end
 end

@@ -52,8 +52,7 @@ RSpec.describe 'Exclude as text' do
   end
 
   it 'outputs with exclude as text' do
-    output = CaseGen::Output.new(generator)
-    output.exclude_as_text = true
+    output = CaseGen::Output.new(generator, :exclude_as_text)
     expect(output.to_s).to eq "#{expected_combo_table}\n#{expected_exclude_as_text}"
   end
 end

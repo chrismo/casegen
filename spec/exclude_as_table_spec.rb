@@ -33,7 +33,7 @@ RSpec.describe 'Exclude as table' do
   let(:fix) { Fixtures[:box] }
 
   it 'output' do
-    output = CaseGen.generate(fix[:sets], fix[:rules], [:exclude_as_table])
+    output = CaseGen.generate(fix[:sets], fix[:rules], :exclude_as_table)
     expect(output.to_s).to eq "#{expected_combo_table}\n#{expected_exclude_as_table}"
   end
 end

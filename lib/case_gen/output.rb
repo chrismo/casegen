@@ -4,18 +4,16 @@ module CaseGen
   class Output
     include RuleDescription
 
-    attr_accessor :exclude_as_text, :exclude_inline, :exclude_inline_footnotes,
-                  :exclude_as_table
-
-    def initialize(generator)
+    def initialize(generator, output_type = :exclude)
       @generator = generator
+      @output_type = output_type
     end
 
     def to_s
       @generator.combos_table.to_s.tap do |o|
-        o << exclude_rules_as_text if @exclude_as_text
-        o << exclude_rules_inline_footnotes if @exclude_inline_footnotes
-        o << exclude_rules_as_table if @exclude_as_table
+        o << exclude_rules_as_text if exclude_as_text
+        o << exclude_rules_inline_footnotes if exclude_inline_footnotes
+        o << exclude_rules_as_table if exclude_as_table
       end
     end
 
@@ -40,7 +38,23 @@ module CaseGen
     end
 
     def exclude_rules_as_table
-      "\n#{@generator.exclusions_table.to_s}"
+      "\n#{@generator.exclusions_table}"
+    end
+
+    def exclude_as_text
+      @output_type == :exclude_as_text
+    end
+
+    def exclude_inline
+      @output_type == :exclude_inline
+    end
+
+    def exclude_inline_footnotes
+      @output_type == :exclude_inline_footnotes
+    end
+
+    def exclude_as_table
+      @output_type == :exclude_as_table
     end
   end
 end

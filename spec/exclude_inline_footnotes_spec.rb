@@ -52,7 +52,7 @@ RSpec.describe 'Exclude inline with footnotes' do
   let(:rules) { Fixtures[:pricing][:rules] }
 
   it 'output' do
-    result = CaseGen.generate(sets, rules, [:exclude_inline_footnotes])
+    result = CaseGen.generate(sets, rules, :exclude_inline_footnotes)
     expect(result).to eq expected_table.chomp
   end
 end
