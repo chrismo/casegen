@@ -10,14 +10,51 @@ module CaseGen
     end
 
     def to_s
-      @generator.combos_table.to_s.tap do |o|
-        o << exclude_rules_as_text if exclude_as_text
-        o << exclude_rules_inline_footnotes if exclude_inline_footnotes
-        o << exclude_rules_as_table if exclude_as_table
+      update_excluded_values
+      include, exclude = partition_exclusions
+
+      as_table(include).tap do |o|
+        o << exclude_rules_as_text if @output_type == :exclude_as_text
+        o << exclude_rules_inline_footnotes if @output_type == :exclude_inline_footnotes
+        o << "\n#{as_table(exclude)}" if @output_type == :exclude_as_table
       end
     end
 
     private
+
+    def as_table(combos)
+      combos.map(&:hash_row).to_table.to_s
+    end
+
+    def update_excluded_values
+      @generator.combos.each do |combo|
+        if combo.excluded?
+          value = exclude_description(combo.excluded_by_rule)
+          combo.append(:exclude, value)
+        end
+      end
+    end
+
+    def partition_exclusions
+      combos = @generator.combos
+
+      case @output_type
+      when :exclude_as_table, :exclude, :exclude_as_text
+        exclude, include = combos.partition(&:excluded?)
+        [include, exclude]
+      when :exclude_inline, :exclude_inline_footnotes
+        [combos, []]
+      end
+    end
+
+    def exclude_description(rule)
+      case @output_type
+      when :exclude_inline_footnotes
+        "[#{rule.rule_data[:index]}]"
+      when :exclude_inline, :exclude_as_table
+        rule.description
+      end
+    end
 
     def exclude_rules_as_text
       body = @generator.rules[:exclude].map do |rule|
@@ -35,26 +72,6 @@ module CaseGen
         ["[#{rule[:index]}] #{rule_description(rule)}"]
       end
       (header + body).join("\n")
-    end
-
-    def exclude_rules_as_table
-      "\n#{@generator.exclusions_table}"
-    end
-
-    def exclude_as_text
-      @output_type == :exclude_as_text
-    end
-
-    def exclude_inline
-      @output_type == :exclude_inline
-    end
-
-    def exclude_inline_footnotes
-      @output_type == :exclude_inline_footnotes
-    end
-
-    def exclude_as_table
-      @output_type == :exclude_as_table
     end
   end
 end

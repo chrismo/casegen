@@ -2,7 +2,7 @@
 
 module CaseGen
   class Combination
-    attr_reader :names
+    attr_reader :names, :excluded_by_rule
 
     def initialize(hash_pairs)
       @names = hash_pairs.map do |h|
@@ -25,6 +25,14 @@ module CaseGen
       @names << key if defined?(@names)
       instance_variable_set("@#{key}", value)
       self.class.attr_accessor key
+    end
+
+    def exclude_with(rule)
+      @excluded_by_rule = rule
+    end
+
+    def excluded?
+      !@excluded_by_rule.nil?
     end
   end
 end

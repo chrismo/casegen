@@ -5,11 +5,12 @@ module CaseGen
     include ComboMatcher
     include RuleDescription
 
-    def initialize(rule_data, output_type = :exclude)
+    attr_reader :rule_data, :description
+
+    def initialize(rule_data)
       @rule_data = rule_data
       @description = rule_description(rule_data)
       @criteria = rule_data[:criteria]
-      @output_type = output_type
     end
 
     def apply(combos)
@@ -36,22 +37,13 @@ module CaseGen
     def process_matches(combos, matches)
       combos.each do |combo|
         next unless matches.include?(combo)
-        next if combo.names.include?(:exclude)
+        next if combo.excluded?
 
-        combo.append(:exclude, exclude_description)
+        combo.exclude_with(self)
         expect_keys = combo.names.select { |name| combo.send(name) == :expect }
         expect_keys.each do |expect_key|
           combo.send("#{expect_key}=", '')
         end
-      end
-    end
-
-    def exclude_description
-      case @output_type
-      when :exclude_inline_footnotes
-        "[#{@rule_data[:index]}]"
-      when :exclude_inline, :exclude_as_table
-        @description
       end
     end
   end

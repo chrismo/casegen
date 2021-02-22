@@ -4,7 +4,7 @@ module CaseGen
   class ExpectRule
     include ComboMatcher
 
-    def initialize(rule_data, _)
+    def initialize(rule_data)
       @rule_data = rule_data
     end
 

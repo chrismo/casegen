@@ -11,7 +11,7 @@ require_relative 'case_gen/output'
 
 module CaseGen
   def self.generate(sets, rules, output_type = :exclude)
-    generator = CaseGen::Generator.new(sets, rules, output_type)
+    generator = CaseGen::Generator.new(sets, rules)
     CaseGen::Output.new(generator, output_type).to_s
   end
 end
