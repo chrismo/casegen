@@ -2,9 +2,10 @@
 
 module CaseGen
   class ExpectRule
+    include ComboMatcher
+
     def initialize(rule_data, options = [])
       @rule_data = rule_data
-      @ignore_keys = %i[description reason note index]
       @options = options
     end
 
@@ -13,10 +14,7 @@ module CaseGen
         expect_keys = combo.names.select { |name| combo.send(name) == :expect }
         next if expect_keys.none?
 
-        criteria_keys = (@rule_data.keys - expect_keys) - @ignore_keys
-        criteria = @rule_data.slice(*criteria_keys)
-
-        next unless criteria == combo.hash_row.slice(*criteria_keys)
+        next unless matches_criteria(combo, expect_keys)
 
         expect_keys.each do |expect_key|
           combo.send("#{expect_key}=", @rule_data[expect_key])

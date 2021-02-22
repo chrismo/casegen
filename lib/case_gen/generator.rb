@@ -4,7 +4,7 @@ require 'tablesmith'
 
 module CaseGen
   class Generator
-    attr_reader :sets, :rules, :combos
+    attr_reader :sets, :rules, :combos, :exclusions
 
     def initialize(sets, rules, options = [])
       @sets = sets.map do |title, values|
@@ -13,11 +13,15 @@ module CaseGen
       @rules = rules
       @options = options
       @combos = generate_combinations
-      apply_rules
+      process_rules
     end
 
     def combos_table
       @combos.map(&:hash_row).to_table
+    end
+
+    def exclusions_table
+      @exclusions.map(&:hash_row).to_table
     end
 
     private
@@ -32,6 +36,11 @@ module CaseGen
       head.product(*rest)
     end
 
+    def process_rules
+      apply_rules
+      process_exclusions
+    end
+
     def apply_rules
       @rules.each do |type, rules|
         klass = CaseGen.const_get("#{type.to_s.capitalize}Rule")
@@ -40,6 +49,16 @@ module CaseGen
           klass.new(rule_data, @options).apply(@combos)
         end
       end
+    end
+
+    def process_exclusions
+      return if @options.include?(:exclude_inline)
+      return if @options.include?(:exclude_inline_footnotes)
+
+      exclude, include = @combos.partition { |combo| combo.names.include?(:exclude) }
+
+      @combos = include
+      @exclusions = @options.include?(:exclude_as_table) ? exclude : []
     end
   end
 end
