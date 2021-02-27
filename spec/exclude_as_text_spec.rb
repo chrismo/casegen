@@ -47,12 +47,12 @@ RSpec.describe 'Exclude as text' do
   end
 
   it 'output only combos table' do
-    output = CaseGen::Output.new(generator)
+    output = CaseGen::Exclude.new(generator)
     expect(output.to_s).to eq expected_combo_table
   end
 
   it 'outputs with exclude as text' do
-    output = CaseGen::Output.new(generator, :exclude_as_text)
+    output = CaseGen::ExcludeAsText.new(generator)
     expect(output.to_s).to eq "#{expected_combo_table}\n#{expected_exclude_as_text}"
   end
 end
