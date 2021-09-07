@@ -37,7 +37,7 @@ rules = {
 }
 
 if __FILE__ == $PROGRAM_NAME
-  puts CaseGen.generate(sets, rules, [:exclude_as_text]).to_s
+  puts CaseGen.generate(sets, rules, :exclude_as_text).to_s
 else
   Fixtures.add(:cart, sets, rules)
 end
