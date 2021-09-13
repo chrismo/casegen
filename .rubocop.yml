@@ -1,0 +1,109 @@
+require:
+  - rubocop-performance
+  - rubocop-rake
+  - rubocop-rspec
+
+AllCops:
+  TargetRubyVersion: 2.5
+  NewCops: disable
+  Exclude:
+    - bin/*
+
+Layout/ClassStructure:
+  Enabled: true
+  Categories:
+    module_inclusion:
+      - include
+      - prepend
+      - extend
+  ExpectedOrder:
+    - module_inclusion
+    - public_class_methods
+    - initializer
+    - public_methods
+    - protected_methods
+    - private_methods
+
+Layout/DotPosition:
+  EnforcedStyle: trailing
+
+Layout/LineLength:
+  Enabled: false
+  Max: 120
+  AllowHeredoc: true
+  AllowURI: true
+  URISchemes: http, https
+
+Layout/MultilineMethodCallIndentation:
+  Enabled: false
+
+Layout/SpaceInsideHashLiteralBraces:
+  Enabled: false
+
+Metrics:
+  Enabled: true
+
+Metrics/AbcSize:
+  Max: 20
+
+Metrics/BlockLength:
+  Exclude:
+    - 'Rakefile'
+    - '**/*.rake'
+    - 'spec/**/*.rb'
+    - 'test/**/*.rb'
+  IgnoredMethods: ['included', 'namespace']
+
+Metrics/ClassLength:
+  Exclude:
+    - 'Rakefile'
+    - 'spec/**/*.rb'
+    - 'test/**/*.rb'
+
+Metrics/MethodLength:
+  CountComments: false  # count full line comments?
+  Max: 15
+
+Naming/MemoizedInstanceVariableName:
+  Enabled: false
+
+RSpec/DescribeClass:
+  Enabled: false
+
+Style/BlockComments:
+  Enabled: false
+
+Style/Documentation:
+  Enabled: false
+
+Style/DocumentationMethod:
+  Enabled: false
+
+Style/FrozenStringLiteralComment:
+  EnforcedStyle: always
+  Enabled: true
+
+Style/GuardClause:
+  Enabled: false
+
+Style/MultilineBlockChain:
+  Enabled: false
+
+# Technically this performs better, and I got no problem with it.
+Style/ParallelAssignment:
+  Enabled: false
+
+Style/RedundantSelf:
+  Enabled: false
+
+Style/TrailingCommaInArrayLiteral:
+  Enabled: false
+
+Style/TrailingCommaInHashLiteral:
+  Enabled: false
+
+Style/WhenThen:
+  Enabled: true
+
+Style/WordArray:
+  Enabled: false
