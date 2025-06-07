@@ -21,3 +21,23 @@ to just use plain Ruby.
 <a href="https://github.com/cornutum/tcases">tcases</a> is one to check out.
 Another is <a href="https://www.satisfice.com/download/allpairs">AllPairs</a> by
 James Bach.
+
+### Can I Use bundle/inline with CaseGen?
+
+```ruby
+#!ruby
+
+# frozen_string_literal: true
+
+require "bundler/inline"
+
+gemfile do
+  source "https://rubygems.org"
+  gem "casegen", "~> 3.0.1"
+end
+
+require 'casegen'
+
+# Normal script from here ...
+
+```

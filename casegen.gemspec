@@ -4,7 +4,7 @@ require_relative 'lib/casegen'
 
 Gem::Specification.new do |gem|
   gem.name = 'casegen'
-  gem.version = '3.0.0'
+  gem.version = '3.0.1'
   gem.authors = ['chrismo']
   gem.email = 'chrismo@clabs.org'
   gem.description = 'Simple tool to generate use cases restricted by sets of rules'
@@ -17,7 +17,7 @@ Gem::Specification.new do |gem|
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
   gem.require_paths = ['lib']
 
-  gem.required_ruby_version = '~> 2.5'
+  gem.required_ruby_version = '>= 2.5'
 
   gem.add_dependency 'tablesmith'
 
