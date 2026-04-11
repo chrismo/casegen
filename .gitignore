@@ -2,3 +2,6 @@
 .idea/
 bin/
 pkg/
+.claude/settings.local.json
+.claude/tmp/
+tmp/
