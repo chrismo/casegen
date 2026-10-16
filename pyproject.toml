@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "casegen"
+version = "3.0.1"
+description = "Generate combinations of variables restricted by rules"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+authors = [{name = "chrismo"}]
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/chrismo/casegen"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 88

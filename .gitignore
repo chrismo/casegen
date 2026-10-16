@@ -5,3 +5,12 @@ pkg/
 .claude/settings.local.json
 .claude/tmp/
 tmp/
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.ruff_cache/
+.coverage
+htmlcov/
