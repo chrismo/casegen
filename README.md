@@ -3,7 +3,7 @@
 CaseGen generates combinations of variables, optionally restricted by rules,
 with expected results and readable tables.
 
-**`python-port` is a standalone, long-lived branch, not intended to merge into
+**`casegen-py` is a standalone, long-lived branch, not intended to merge into
 `main`.** The [Ruby gem remains on `main`](https://github.com/chrismo/casegen/tree/main).
 The original Ruby files are retained here as reference material; the Python
 package does not depend on Ruby.
